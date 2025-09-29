@@ -1,0 +1,181 @@
+:root{
+  --bg: #f7f8fb;
+  --card: #ffffff;
+  --fg: #0f1724;
+  --muted: #6b7280;
+  --accent: #3b82f6; /* blue accent */
+  --accent-strong: #2563eb;
+  --border: #e6e9ef;
+  --glass: rgba(15,23,36,0.04);
+}
+html,body,#root{height:100%;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--fg);
+  font-family: Inter, Roboto, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial;
+}
+.app{
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+}
+.header{
+  padding:12px 16px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4));
+  border-bottom: 1px solid var(--border);
+}
+.main{
+  flex:1;
+  display:flex;
+  padding:16px;
+  gap:16px;
+}
+.left{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.right{
+  width:360px;
+}
+.lyrics{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.lyric-container{
+  width:90%;
+  max-width:1200px;
+  background: var(--card);
+  border-radius:12px;
+  padding:20px;
+  box-shadow: 0 6px 18px rgba(16,24,40,0.06);
+}
+.line{
+  font-size: clamp(18px, 3.6vw, 44px);
+  padding:8px 0;
+  color: var(--muted);
+}
+.line.current{ font-weight:700; color: var(--fg); }
+.line.next{ color: #9ca3af; }
+.progress-bar{ height:8px; background:var(--glass); border-radius:6px; overflow:hidden; }
+.progress-fill{ height:100%; background:var(--accent); width:0%; transition: width 0.08s linear; }
+.controls{ display:flex; gap:8px; align-items:center; }
+.input-uri{ flex:1; padding:10px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--fg); }
+.button{ padding:8px 12px; background:var(--card); border:1px solid var(--border); border-radius:8px; cursor:pointer; color:var(--fg); box-shadow: 0 2px 6px rgba(16,24,40,0.04); }
+.button:hover{ background: linear-gradient(180deg, #f3f4f6, #ffffff); border-color: var(--accent-strong); }
+.small{ font-size:13px; color:var(--muted) }
+
+/* Card / right column */
+.right > * { background: var(--card); border-radius:10px; box-shadow: 0 6px 18px rgba(16,24,40,0.04); margin-bottom:12px; }
+.right img{ border-radius:8px }
+
+/* Word highlighting inside lines */
+.word{ color: var(--muted); }
+.word.done{ color: rgba(15,23,36,0.6); opacity:0.8 }
+.word.current{ color: var(--accent-strong); font-weight:700 }
+
+/* Toasts: style the inline toasts (Toasts component uses inline styles but we provide classes for customization) */
+.toast{ padding:12px; border-radius:10px; box-shadow: 0 8px 20px rgba(2,6,23,0.08); }
+.toast.info{ background: linear-gradient(180deg,#ecfeff,#f8feff); color: #064e3b }
+.toast.warn{ background: linear-gradient(180deg,#fff7ed,#fffbf0); color: #92400e }
+.toast.error{ background: linear-gradient(180deg,#fff1f2,#fff7f7); color: #7f1d1d }
+
+/* Misc */
+.progress-fill.transition{ transition: width 0.1s linear }
+
+/* Modern select/dropdown styling */
+.select-wrapper{
+  position: relative;
+  display: block;
+}
+.modern-select{
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 44px 10px 12px;
+  font-size:14px;
+  color:var(--fg);
+  box-shadow: 0 2px 8px rgba(16,24,40,0.04);
+  transition: border-color .12s ease, box-shadow .12s ease;
+}
+.modern-select:hover{
+  border-color: rgba(37,99,235,0.12);
+}
+.modern-select:focus{
+  outline: none;
+  border-color: var(--accent-strong);
+  box-shadow: 0 6px 18px rgba(37,99,235,0.08);
+}
+.select-arrow{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  pointer-events:none;
+  color:var(--muted);
+  font-size:14px;
+}
+
+/* style options for better readability */
+.modern-select option{
+  padding:8px;
+}
+
+/* make the select wrapper fit the card style */
+.select-wrapper .modern-select{
+  background: linear-gradient(180deg, var(--card), #fcfdff);
+}
+
+/* Playlist card */
+.playlist-card{
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.playlist-card:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(16,24,40,0.08);
+}
+
+/* Modal overlay and content */
+.modal-overlay{
+  position: fixed;
+  left:0; right:0; top:0; bottom:0;
+  background: rgba(2,6,23,0.4);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:2000;
+  padding:24px;
+}
+.modal{
+  width: min(1100px, 96%);
+  max-height: 90vh;
+  overflow:auto;
+  background: var(--card);
+  border-radius:12px;
+  padding:16px;
+  box-shadow: 0 18px 50px rgba(2,6,23,0.14);
+}
+
+/* Track item */
+.track-item{ background: linear-gradient(180deg,var(--card),#ffffff); }
+.track-item .button{ padding:6px 10px; }
+
+/* small tweaks for images inside cards */
+.playlist-card img{ border-radius:8px; }
+
+/* Responsive tweaks */
+@media (max-width: 900px){
+  .right{ display:none }
+  .lyric-container{ padding:28px }
+}
