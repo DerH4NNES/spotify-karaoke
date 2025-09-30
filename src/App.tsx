@@ -147,8 +147,9 @@ function App(){
     // Immediately show new lyrics (preload asynchronously) so the UI shows thechosen song during the countdown.
     setShowLyrics(true)
     setForceShowLibrary(false)
-    setLines([]); // clear previous lyrics while loading
-    (async ()=>{
+    setLines([]) // clear previous lyrics while loading
+    // start preload and keep the promise so we can await it before countdown
+    const preloadPromise = (async ()=>{
       try{
         const artist = (track?.artists?.[0]?.name) || ''
         const title = track?.name || ''
@@ -171,6 +172,12 @@ function App(){
       return
     }
 
+    // ensure lyrics are loaded before starting the countdown/playing
+    try{ await preloadPromise }catch(e){ /* ignore preload errors */ }
+
+    // Reset UI progress to 0 before the countdown and eventual playback
+    setTrackMeta((prev:any)=> prev ? { ...prev, progress_ms: 0, is_playing: false } : { item: null, progress_ms: 0, is_playing: false, duration_ms: track?.duration_ms })
+
     // device selected and transfer should have happened. Ensure lyrics are visible (they already are), then countdown
     try{
       // start 5s countdown overlay
@@ -187,6 +194,7 @@ function App(){
         // ensure repeat and shuffle are off on the target device before starting playback to avoid immediate looping
         try{ await spotifyApi.setRepeat('off', selectedId) }catch(e:any){ console.warn('setRepeat failed', e); pushMessage('warn','Could not disable repeat mode') }
         try{ await spotifyApi.setShuffle(false, selectedId) }catch(e:any){ console.warn('setShuffle failed', e); pushMessage('warn','Could not disable shuffle') }
+        setPlayPending(true)
         await spotifyApi.play({ uri: track?.uri, deviceId: selectedId })
         // fetch currently playing metadata
         const meta = await spotifyApi.getCurrentlyPlaying()
@@ -196,6 +204,9 @@ function App(){
         setForceShowLibrary(false)
       }catch(e:any){ pushMessage('error','Playback failed: '+(e?.message||e)) }
     }catch(e:any){ console.error('playflow failed', e); pushMessage('error','Failed to start playback') }
+    finally {
+      setPlayPending(false)
+    }
   }
 
   // close lyric view: stop playback and go back to library
@@ -296,11 +307,12 @@ function App(){
 
   // Receive library visibility from Controls to avoid duplicating the visibility logic
   const [controlsLibraryVisible, setControlsLibraryVisible] = useState<boolean>(false)
-  // final library visibility also considers forced library display from App logic
-  const libraryVisible = controlsLibraryVisible || forceShowLibrary
+  const [playPending, setPlayPending] = useState<boolean>(false)
+   // final library visibility also considers forced library display from App logic
+   const libraryVisible = controlsLibraryVisible || forceShowLibrary
 
-  return (
-    <div className="app">
+   return (
+     <div className="app">
      <Toasts messages={messages} onDismiss={dismissMessage} />
       <div className="header">
         <h1>karaoke-spotify</h1>
@@ -323,11 +335,34 @@ function App(){
       </div>
       <div className="main">
         <div className="left">
-          {((isPlaying || showLyrics) && !forceShowLibrary) && (
+          {(((isPlaying || showLyrics) && !forceShowLibrary) || countdown > 0) && (
             <div className="lyrics">
               <div className="lyric-container" style={{position:'relative'}}>
                 <button onClick={()=>closeLyricsView()} style={{position:'absolute', right:12, top:12, zIndex:20}} className="button">Schließen</button>
-                <LyricRenderer lines={lines} getPosition={getPosition} offsetMs={offsetMs} onOffsetChange={setOffsetMs} durationMs={(trackMeta?.item?.duration_ms) ?? trackMeta?.duration_ms} onSeek={handleSeek} />
+                {/* Render lyrics+progress only when countdown finished. Otherwise render a same-sized placeholder so layout doesn't shift or show a small bar. */}
+                {countdown === 0 ? (
+                  <div className="lyric-content fade-in">
+                    <LyricRenderer lines={lines} getPosition={getPosition} offsetMs={offsetMs} durationMs={(trackMeta?.item?.duration_ms) ?? trackMeta?.duration_ms} onSeek={handleSeek} initialProgressMs={0} />
+                  </div>
+                ) : (
+                  <div>
+                    {/* Placeholder top area (keeps same height as LyricRenderer's main area) */}
+                    <div style={{height:'70vh', display:'flex', flexDirection:'column', justifyContent:'center'}}>
+                      {/* empty center to preserve space while countdown overlay shows */}
+                    </div>
+                    {/* Placeholder for full-track progress area to preserve layout height */}
+                    <div style={{padding:'8px 12px'}}>
+                      <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', gap:8, marginBottom:6}}>
+                        <div className="small">&nbsp;</div>
+                        <div className="small">&nbsp;</div>
+                      </div>
+                      {/* Use card background and a subtle border so the placeholder looks like the real bar but doesn't show a thin contrasting strip */}
+                      <div style={{height:10, background:'var(--card)', borderRadius:6, position:'relative', border: '1px solid var(--border)'}}>
+                        <div style={{position:'absolute', left:0, top:0, bottom:0, width:`0%`, background:'var(--accent)', borderRadius:6}} />
+                      </div>
+                    </div>
+                  </div>
+                )}
                 {/* Countdown overlay */}
                 {countdown > 0 && (
                   <div style={{position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', pointerEvents:'none'}}>
@@ -349,7 +384,7 @@ function App(){
             </div>
           )}
           <div style={{padding:'8px'}}>
-            <Controls onRequestPlay={handleRequestPlay} offsetMs={offsetMs} setOffsetMs={setOffsetMs} playerClient={playerClient} ready={ready} isPlayingNow={isPlayingNow} countdown={countdown} deviceModalOpen={deviceModalOpen} onLibraryVisibleChange={setControlsLibraryVisible} />
+            <Controls onRequestPlay={handleRequestPlay} offsetMs={offsetMs} setOffsetMs={setOffsetMs} playerClient={playerClient} ready={ready} isPlayingNow={isPlayingNow} countdown={countdown} deviceModalOpen={deviceModalOpen} playPending={playPending} onLibraryVisibleChange={setControlsLibraryVisible} />
           </div>
         </div>
         {!libraryVisible && (

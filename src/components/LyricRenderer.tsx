@@ -8,9 +8,10 @@ type Props = {
   onOffsetChange: (v:number)=>void
   durationMs?: number
   onSeek?: (ms:number)=>void
+  initialProgressMs?: number
 }
 
-export default function LyricRenderer({ lines, getPosition, offsetMs, onOffsetChange, durationMs, onSeek }: Props){
+export default function LyricRenderer({ lines, getPosition, offsetMs, onOffsetChange, durationMs, onSeek, initialProgressMs = 0 }: Props){
   const [cursor, setCursor] = useState(0)
   const [progress, setProgress] = useState(0)
   const [currentTime, setCurrentTime] = useState(0)
@@ -20,6 +21,11 @@ export default function LyricRenderer({ lines, getPosition, offsetMs, onOffsetCh
 
   useEffect(()=>{
     let mounted = true
+    // initialize with given initial progress (ms) so UI shows 0 before playback starts
+    if(initialProgressMs != null){
+      setRawPos(initialProgressMs)
+      setCurrentTime(initialProgressMs + offsetMs)
+    }
     async function loop(){
       try{
         const pos = await getPosition()
