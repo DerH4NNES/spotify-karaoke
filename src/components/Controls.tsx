@@ -13,9 +13,9 @@ export default function Controls({ onRequestPlay, offsetMs, setOffsetMs, playerC
 
   return (
     <div>
-      <div style={{display:'flex', gap:8}}>
+      <div className="d-flex gap-2">
         {/* Playlist library replaces the free-form URI input */}
-        <div style={{flex:1}}>
+        <div className="flex-grow-1">
           {libraryVisible && (
             <div className="library-fade">
               <PlaylistLibrary onRequestPlay={(track)=> onRequestPlay(track)} />

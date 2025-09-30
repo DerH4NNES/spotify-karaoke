@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import * as spotifyApi from '../spotify/api'
+import { Form, Row, Col, Button, Spinner } from 'react-bootstrap'
 
 type Props = {
   track: any
@@ -43,53 +44,49 @@ export default function DeviceChooser({ track, onConfirm, onCancel }: Props){
     return ()=> clearTimeout(t)
   },[countdown])
 
-  function startCountdown(){
-    setCountdown(5)
-  }
+  function startCountdown(){ setCountdown(5) }
 
   return (
-    <div style={{display:'flex', flexDirection:'column', gap:12}}>
-      <div style={{display:'flex', gap:12, alignItems:'center'}}>
-        <div style={{flex:1}}>
-          <div style={{fontWeight:700, fontSize:18}}>{track?.name}</div>
-          <div className="small">{(track?.artists||[]).map((a:any)=>a.name).join(', ')}</div>
-        </div>
-      </div>
+    <div>
+      <Row className="mb-3 align-items-center">
+        <Col>
+          <div className="fw-bold">{track?.name}</div>
+          <div className="small text-muted">{(track?.artists||[]).map((a:any)=>a.name).join(', ')}</div>
+        </Col>
+      </Row>
 
-      <div style={{display:'flex', gap:12}}>
-        <div style={{flex:1}}>
-          <label className="small">Play on device</label>
-          <div style={{marginTop:8}}>
-            {loading ? <div className="small">Loading devices...</div> : (
-              <div style={{display:'flex', gap:8, flexDirection:'column'}}>
-                {error && <div className="small" style={{color:'#ff6b6b'}}>Failed to load devices: {error}</div>}
-                {devices.length===0 && !error && <div className="small">No devices found. Open Spotify or use a device.</div>}
-                {devices.map(d=> (
-                  <label key={d.id} style={{display:'flex', alignItems:'center', gap:8}}>
-                    <input type="radio" name="device" checked={selected===d.id} onChange={()=>setSelected(d.id)} />
-                    <div style={{fontWeight:700}}>{d.name}</div>
-                    <div className="small" style={{marginLeft:8, color: d.is_active ? 'var(--accent-strong)' : 'var(--muted)'}}>{d.is_active ? '(active)' : d.type}</div>
-                  </label>
-                ))}
-                <label style={{display:'flex', alignItems:'center', gap:8}}>
-                  <input type="radio" name="device" checked={selected===null} onChange={()=>setSelected(null)} />
-                  <div className="small">No device (let Spotify choose)</div>
-                </label>
+      <Row>
+        <Col md={8}>
+          <Form.Label className="small">Play on device</Form.Label>
+          <div className="mt-2">
+            {loading ? (
+              <div className="small"><Spinner animation="border" size="sm" /> Loading devices...</div>
+            ) : (
+              <div>
+                {error && <div className="small text-danger">Failed to load devices: {error}</div>}
+                {devices.length === 0 && !error && <div className="small">No devices found. Open Spotify or use a device.</div>}
+                <Form>
+                  {devices.map(d => (
+                    <Form.Check type="radio" id={`dev-${d.id}`} name="device" key={d.id} className="mb-2" checked={selected===d.id} onChange={()=>setSelected(d.id)} label={<><strong>{d.name}</strong> <span className="small text-muted">{d.is_active ? '(active)' : d.type}</span></>} />
+                  ))}
+                  <Form.Check type="radio" id={`dev-none`} name="device" className="mb-2" checked={selected===null} onChange={()=>setSelected(null)} label={<span className="small">No device (let Spotify choose)</span>} />
+                </Form>
               </div>
             )}
           </div>
-        </div>
-        <div style={{width:200, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center'}}>
+        </Col>
+
+        <Col md={4} className="d-flex flex-column align-items-center justify-content-center">
           {countdown ? (
             <div style={{fontSize:48, fontWeight:700}}>{countdown}</div>
           ) : (
-            <button className="button" style={{padding:'20px 28px', fontSize:18}} onClick={startCountdown} disabled={loading}>Play</button>
+            <Button size="lg" style={{padding:'18px 26px', fontSize:18}} onClick={startCountdown} disabled={loading}>Play</Button>
           )}
-          <div style={{marginTop:8}}>
-            <button className="button" onClick={onCancel}>Cancel</button>
+          <div className="mt-2">
+            <Button variant="secondary" onClick={onCancel}>Cancel</Button>
           </div>
-        </div>
-      </div>
+        </Col>
+      </Row>
     </div>
   )
 }

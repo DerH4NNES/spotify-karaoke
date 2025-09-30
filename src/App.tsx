@@ -130,7 +130,7 @@ function App(){
         try{
           const me = await spotifyApi.getMe()
           if(me && me.product && me.product !== 'premium'){
-            pushMessage('warn', 'Spotify account is not Premium — Web Playback SDK needs Premium')
+            pushMessage('warn', 'Spotify account is not Premium  Web Playback SDK needs Premium')
           }
         }catch(e){ console.warn('getMe failed', e) }
 
@@ -314,22 +314,22 @@ function App(){
    return (
      <div className="app">
      <Toasts messages={messages} onDismiss={dismissMessage} />
-      <div className="header">
-        <h1>karaoke-spotify</h1>
-        <div style={{marginLeft:12}} className="small">
+      <div className="header d-flex align-items-center px-3 py-2">
+        <h1 className="m-0">karaoke-spotify</h1>
+        <div className="ms-2 small">
             {authChecked ? (
               ready ? (
-                <span style={{background:'#4caf50', color:'white', padding:'4px 8px', borderRadius:999, fontWeight:600, fontSize:12}}>Ready</span>
+                <span className="badge bg-success">Ready</span>
               ) : (
                 'Not authenticated'
               )
             ) : 'Checking auth...'}
           </div>
-        <div style={{marginLeft:'auto', display:'flex', gap:8}}>
+        <div className="ms-auto d-flex gap-2">
           {!ready ? (
-            <button className="button" onClick={handleLogin}>Login (Spotify)</button>
+            <button className="btn btn-primary" onClick={handleLogin}>Login (Spotify)</button>
           ) : (
-            <button className="button" onClick={handleLogout}>Logout</button>
+            <button className="btn btn-outline-secondary" onClick={handleLogout}>Logout</button>
           )}
         </div>
       </div>
@@ -337,8 +337,8 @@ function App(){
         <div className="left">
           {(((isPlaying || showLyrics) && !forceShowLibrary) || countdown > 0) && (
             <div className="lyrics">
-              <div className="lyric-container" style={{position:'relative'}}>
-                <button onClick={()=>closeLyricsView()} style={{position:'absolute', right:12, top:12, zIndex:20}} className="button">Schließen</button>
+              <div className="lyric-container position-relative" >
+                <button onClick={()=>closeLyricsView()} className="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-3">Schließen</button>
                 {/* Render lyrics+progress only when countdown finished. Otherwise render a same-sized placeholder so layout doesn't shift or show a small bar. */}
                 {countdown === 0 ? (
                   <div className="lyric-content fade-in">
@@ -351,31 +351,31 @@ function App(){
                       {/* empty center to preserve space while countdown overlay shows */}
                     </div>
                     {/* Placeholder for full-track progress area to preserve layout height */}
-                    <div style={{padding:'8px 12px'}}>
-                      <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', gap:8, marginBottom:6}}>
+                    <div className="p-2">
+                      <div className="d-flex justify-content-between align-items-center gap-2 mb-2">
                         <div className="small">&nbsp;</div>
                         <div className="small">&nbsp;</div>
                       </div>
-                      {/* Use card background and a subtle border so the placeholder looks like the real bar but doesn't show a thin contrasting strip */}
-                      <div style={{height:10, background:'var(--card)', borderRadius:6, position:'relative', border: '1px solid var(--border)'}}>
-                        <div style={{position:'absolute', left:0, top:0, bottom:0, width:`0%`, background:'var(--accent)', borderRadius:6}} />
+                      {/* Use Bootstrap progress to mimic placeholder */}
+                      <div className="progress" style={{height:10, borderRadius:6}}>
+                        <div className="progress-bar" role="progressbar" style={{width:'0%'}} aria-valuenow={0} aria-valuemin={0} aria-valuemax={100}></div>
                       </div>
                     </div>
                   </div>
                 )}
                 {/* Countdown overlay */}
                 {countdown > 0 && (
-                  <div style={{position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', pointerEvents:'none'}}>
+                  <div className="position-absolute" style={{inset:0, display:'flex', alignItems:'center', justifyContent:'center', pointerEvents:'none'}}>
                     <div style={{fontSize:96, fontWeight:800, color:'rgba(255,255,255,0.9)', textShadow:'0 4px 12px rgba(0,0,0,0.6)'}}>{countdown}</div>
                   </div>
                 )}
                 {/* Ended overlay: show button to go back to the library */}
                 {trackEnded && (
-                  <div style={{position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center'}}>
-                    <div style={{display:'flex', flexDirection:'column', gap:8, alignItems:'center'}}>
+                  <div className="position-absolute" style={{inset:0, display:'flex', alignItems:'center', justifyContent:'center'}}>
+                    <div className="d-flex flex-column gap-2 align-items-center">
                       <div style={{fontSize:20, fontWeight:700}}>Song beendet</div>
-                      <div style={{display:'flex', gap:8}}>
-                        <button className="button" onClick={()=>{ setForceShowLibrary(true); setTrackEnded(false); setShowLyrics(false); setLines([]) }}>Zurück zur Bibliothek</button>
+                      <div className="d-flex gap-2">
+                        <button className="btn btn-secondary" onClick={()=>{ setForceShowLibrary(true); setTrackEnded(false); setShowLyrics(false); setLines([]) }}>Zurück zur Bibliothek</button>
                       </div>
                     </div>
                   </div>
@@ -383,50 +383,43 @@ function App(){
               </div>
             </div>
           )}
-          <div style={{padding:'8px'}}>
+          <div className="p-2">
             <Controls onRequestPlay={handleRequestPlay} offsetMs={offsetMs} setOffsetMs={setOffsetMs} playerClient={playerClient} ready={ready} isPlayingNow={isPlayingNow} countdown={countdown} deviceModalOpen={deviceModalOpen} playPending={playPending} onLibraryVisibleChange={setControlsLibraryVisible} />
           </div>
         </div>
         {!libraryVisible && (
           <div className="right">
-           <div style={{padding:8, display:'flex', flexDirection:'column', gap:12}}>
-             <div style={{display:'flex', gap:8}}>
+           <div className="p-2 d-flex flex-column gap-3">
+             <div className="d-flex gap-2">
                {isPlaying ? (
                  <>
-                   <button className="button" onClick={()=>togglePlayback()}>{isPlayingNow ? 'Pause' : 'Play'}</button>
-                   <button className="button" onClick={()=>seek(-5000)}>-5s</button>
-                   <button className="button" onClick={()=>seek(5000)}>+5s</button>
+                   <button className="btn btn-primary" onClick={()=>togglePlayback()}>{isPlayingNow ? 'Pause' : 'Play'}</button>
+                   <button className="btn btn-outline-primary" onClick={()=>seek(-5000)}>-5s</button>
+                   <button className="btn btn-outline-primary" onClick={()=>seek(5000)}>+5s</button>
                  </>
                ) : null}
-                <button className="button" onClick={toggleFullscreen}>Fullscreen</button>
-              </div>
-              <div>
-                <label className="small">Offset</label>
-                <div style={{display:'flex', gap:8, alignItems:'center'}}>
-                  <button className="button" onClick={()=>setOffsetMs(offsetMs-100)}>-100</button>
-                  <input type="range" min={-2000} max={2000} step={10} value={offsetMs} onChange={e=>setOffsetMs(Number(e.target.value))} style={{flex:1}} />
-                  <button className="button" onClick={()=>setOffsetMs(offsetMs+100)}>+100</button>
-                </div>
-              </div>
-            </div>
-             <TrackInfo meta={trackMeta} deviceId={deviceId} getPosition={getPosition} />
-          </div>
-         )}
-        {/* Device selector modal for the play flow */}
-        {deviceModalOpen && (
-          <div className="modal-overlay" onClick={()=>{ setDeviceModalOpen(false); if(selectionResolveRef.current) selectionResolveRef.current('') }}>
-            <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:420}}>
-              <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8}}>
-                <div style={{fontWeight:700}}>Select device</div>
-                <button className="button" onClick={()=>{ setDeviceModalOpen(false); if(selectionResolveRef.current) selectionResolveRef.current('') }}>Cancel</button>
-              </div>
-              <DeviceSelector currentDeviceId={deviceId} onSelect={(id)=>{ setDeviceId(id); pushMessage('info', `Switched to device ${id}`); if(selectionResolveRef.current) selectionResolveRef.current(id); setDeviceModalOpen(false) }} ready={ready} />
-            </div>
+                <button className="btn btn-outline-secondary" onClick={toggleFullscreen}>Fullscreen</button>
+
+             </div>
+
+             {/* track info card */}
+             {trackMeta && (
+               <div className="card p-2">
+                 <TrackInfo meta={trackMeta} deviceId={deviceId} getPosition={getPosition} />
+               </div>
+             )}
+
+             {/* Device selector */}
+             <div className="card p-2">
+               <DeviceSelector currentDeviceId={deviceId} onSelect={(id)=>{ if(selectionResolveRef.current) selectionResolveRef.current(id); }} ready={ready} />
+             </div>
+
+           </div>
           </div>
         )}
       </div>
-    </div>
-  )
+     </div>
+   )
 }
 
 export default App

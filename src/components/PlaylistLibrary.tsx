@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Modal, Button, Card, Spinner } from 'react-bootstrap'
 import * as spotifyApi from '../spotify/api'
 
 export default function PlaylistLibrary({ onRequestPlay } : { onRequestPlay:(track:any)=>void }){
@@ -32,7 +33,6 @@ export default function PlaylistLibrary({ onRequestPlay } : { onRequestPlay:(tra
     setTracksLoading(true)
     try{
       const res = await spotifyApi.getPlaylistTracks(pl.id, 100, 0)
-      // items[].track
       setTracks(res?.items?.map((it:any)=>it.track) || [])
     }catch(e:any){ setTracksError(String(e?.message||e)) }
     setTracksLoading(false)
@@ -41,53 +41,54 @@ export default function PlaylistLibrary({ onRequestPlay } : { onRequestPlay:(tra
   function closeModal(){ setOpenPlaylist(null); setTracks([]); setTracksError(null) }
 
   if(loading) return <div className="small">Loading playlists...</div>
-  if(error) return <div className="small" style={{color:'#ff6b6b'}}>Failed to load playlists: {error}</div>
+  if(error) return <div className="small text-danger">Failed to load playlists: {error}</div>
 
   return (
     <>
-      <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(140px,1fr))', gap:12}}>
+      <div className="row gx-2 gy-2">
         {playlists.map(pl => (
-          <button key={pl.id} className="playlist-card" onClick={()=>openAndLoadTracks(pl)} style={{display:'flex',flexDirection:'column',alignItems:'flex-start',padding:8,borderRadius:10,border:'1px solid var(--border)',background:'linear-gradient(180deg,var(--card),#fcfdff)'}}>
-            <img src={pl.images?.[0]?.url} alt={pl.name} style={{width:'100%',height:120,objectFit:'cover',borderRadius:8,marginBottom:8}} />
-            <div style={{fontWeight:700, fontSize:14, color:'var(--fg)', marginBottom:4, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', width:'100%'}}>{pl.name}</div>
-            <div className="small" style={{width:'100%', color:'var(--muted)'}}>{pl.tracks?.total} tracks • {pl.owner?.display_name}</div>
-          </button>
+          <div key={pl.id} className="col-6 col-sm-4 col-md-1">
+            <Card role="button" onClick={()=>openAndLoadTracks(pl)} className="playlist-card h-100" style={{cursor:'pointer'}}>
+              <Card.Img variant="top" src={pl.images?.[0]?.url} style={{height:120,objectFit:'cover'}} />
+              <Card.Body className="p-2">
+                <div className="fw-bold text-truncate">{pl.name}</div>
+                <div className="small text-muted">{pl.tracks?.total} tracks • {pl.owner?.display_name}</div>
+              </Card.Body>
+            </Card>
+          </div>
         ))}
       </div>
 
-      {openPlaylist && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal" onClick={(e)=>e.stopPropagation()}>
-            <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8}}>
-              <div>
-                <div style={{fontWeight:700}}>{openPlaylist.name}</div>
-                <div className="small">{tracks.length} tracks</div>
-              </div>
-              <button className="button" onClick={closeModal}>Close</button>
-            </div>
-            {tracksLoading ? (
-              <div className="small">Loading tracks...</div>
-            ) : tracksError ? (
-              <div className="small" style={{color:'#ff6b6b'}}>Failed to load tracks: {tracksError}</div>
-            ) : (
-              <div style={{display:'grid', gridTemplateColumns:'1fr', gap:8, maxHeight: '60vh', overflowY:'auto'}}>
-                {tracks.map((t:any, i:number)=> (
-                  <div key={t?.id || i} className="track-item" style={{display:'flex', gap:10, alignItems:'center', padding:8, borderRadius:8, border:'1px solid var(--border)'}}>
-                    <img src={t?.album?.images?.[2]?.url || t?.album?.images?.[0]?.url} alt={t?.name} style={{width:48, height:48, objectFit:'cover', borderRadius:6}} />
-                    <div style={{flex:1, textAlign:'left'}}>
-                      <div style={{fontWeight:700}}>{t?.name}</div>
-                      <div className="small">{(t?.artists||[]).map((a:any)=>a.name).join(', ')}</div>
-                    </div>
-                    <div>
-                      <button className="button" onClick={()=>{ onRequestPlay(t); closeModal() }}>Play</button>
-                    </div>
+      <Modal show={!!openPlaylist} onHide={closeModal} size="xl" aria-labelledby="playlist-modal" scrollable>
+        <Modal.Header closeButton>
+          <Modal.Title id="playlist-modal">{openPlaylist?.name}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {tracksLoading ? (
+            <div className="small"><Spinner animation="border" size="sm" /> Loading tracks...</div>
+          ) : tracksError ? (
+            <div className="small text-danger">Failed to load tracks: {tracksError}</div>
+          ) : (
+            <div style={{maxHeight: '60vh', overflowY:'auto'}}>
+              {tracks.map((t:any, i:number)=> (
+                <div key={t?.id || i} className="track-item d-flex align-items-center p-2 mb-2 rounded" style={{border:'1px solid var(--border)'}}>
+                  <img src={t?.album?.images?.[2]?.url || t?.album?.images?.[0]?.url} alt={t?.name} style={{width:48, height:48, objectFit:'cover', borderRadius:6}} />
+                  <div style={{flex:1, textAlign:'left', marginLeft:12}}>
+                    <div className="fw-bold">{t?.name}</div>
+                    <div className="small text-muted">{(t?.artists||[]).map((a:any)=>a.name).join(', ')}</div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+                  <div>
+                    <Button variant="primary" onClick={()=>{ onRequestPlay(t); closeModal() }}>Play</Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={closeModal}>Close</Button>
+        </Modal.Footer>
+      </Modal>
     </>
   )
 }

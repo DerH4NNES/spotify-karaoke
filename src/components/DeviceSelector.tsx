@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import * as spotifyApi from '../spotify/api'
+import { ListGroup, Badge, Button, Spinner } from 'react-bootstrap'
 
 type DeviceSelectorProps = {
   currentDeviceId?: string | null
@@ -68,65 +69,44 @@ export default function DeviceSelector({ currentDeviceId, onSelect, ready = fals
   }
 
   return (
-    <div style={{padding:12}}>
-      <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-        <div style={{fontWeight:700}}>Devices</div>
-        <div style={{display:'flex', gap:8, alignItems:'center'}}>
-          <div className="small">{devices.length} found</div>
-        </div>
+    <div className="p-2">
+      <div className="d-flex justify-content-between align-items-center mb-2">
+        <div className="fw-bold">Devices</div>
+        <div className="small text-muted">{devices.length} found</div>
       </div>
 
       {loading ? (
-        <div className="small">Loading devices...</div>
+        <div className="small"><Spinner animation="border" size="sm" /> Loading devices...</div>
       ) : (
         <div>
-          {error && <div className="small" style={{color:'#ffb3b3'}}>Error loading devices: {error}</div>}
+          {error && <div className="small text-danger mb-2">Error loading devices: {error}</div>}
 
-          {/* button-list of devices instead of select */}
-          <div style={{marginTop:8, display:'grid', gap:8}}>
+          <ListGroup>
             {devices.length === 0 ? (
               <div className="small">No devices found. Click Refresh to retry.</div>
             ) : (
-              <div style={{display:'grid', gap:8}}>
-                {devices.map(d => {
-                  const isSelected = selected === d.id
-                  const isCurrent = currentDeviceId === d.id
-                  return (
-                    <button
-                      key={d.id}
-                      onClick={()=>{ if(!transferLoading) transferTo(d.id) }}
-                      className={"device-button" + (isSelected ? ' selected' : '')}
-                      style={{
-                        display:'flex',
-                        justifyContent:'space-between',
-                        alignItems:'center',
-                        padding:10,
-                        borderRadius:8,
-                        border: isSelected ? '2px solid var(--accent)' : '1px solid var(--border)',
-                        background: isSelected ? 'linear-gradient(180deg,var(--card),#f0fbff)' : 'transparent',
-                        textAlign:'left',
-                        cursor: transferLoading ? 'wait' : 'pointer',
-                        opacity: transferLoading && !isSelected ? 0.6 : 1
-                      }}
-                    >
-                      <div style={{flex:1, textAlign:'left'}}>
-                        <div style={{fontWeight:700}}>{d.name}</div>
-                        <div className="small" style={{color:'var(--muted)'}}>{d.type} {d.is_active ? '• active' : ''}</div>
-                      </div>
-                      <div style={{marginLeft:12, minWidth:80, textAlign:'right'}} className="small">
-                        {isCurrent ? 'current' : (isSelected ? (transferLoading ? '⏳ Switching…' : 'selected') : '')}
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
+              devices.map(d => {
+                const isSelected = selected === d.id
+                const isCurrent = currentDeviceId === d.id
+                return (
+                  <ListGroup.Item key={d.id} action onClick={()=>{ if(!transferLoading) transferTo(d.id) }} active={isSelected} disabled={transferLoading && !isSelected} className="d-flex justify-content-between align-items-center">
+                    <div>
+                      <div className="fw-bold">{d.name}</div>
+                      <div className="small text-muted">{d.type} {d.is_active ? ' • active' : ''}</div>
+                    </div>
+                    <div className="text-end">
+                      {isCurrent ? <Badge bg="success">current</Badge> : isSelected ? (transferLoading ? <span className="text-muted">⏳ Switching…</span> : <span className="text-muted">selected</span>) : null}
+                    </div>
+                  </ListGroup.Item>
+                )
+              })
             )}
-          </div>
+          </ListGroup>
 
-          {transferError && <div className="small" style={{color:'#ff6b6b', marginTop:8}}>{transferError}</div>}
+          {transferError && <div className="small text-danger mt-2">{transferError}</div>}
 
-          <div style={{display:'flex', gap:8, marginTop:12}}>
-            <button className="button" onClick={loadDevices} disabled={loading || transferLoading}>Refresh</button>
+          <div className="mt-3 d-flex gap-2">
+            <Button variant="outline-secondary" size="sm" onClick={loadDevices} disabled={loading || transferLoading}>Refresh</Button>
           </div>
          </div>
        )}

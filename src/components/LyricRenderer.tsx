@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
 import type { LrcLine } from '../lyrics/parseLrc'
+import { ProgressBar } from 'react-bootstrap'
 
 type Props = {
   lines: LrcLine[]
   getPosition: ()=>Promise<number>
   offsetMs: number
-  onOffsetChange: (v:number)=>void
+  onOffsetChange?: (v:number)=>void
   durationMs?: number
   onSeek?: (ms:number)=>void
   initialProgressMs?: number
@@ -80,7 +81,6 @@ export default function LyricRenderer({ lines, getPosition, offsetMs, onOffsetCh
             {lines.slice(Math.max(0,cursor-3), cursor+6).map((ln, i)=>{
               const realIndex = Math.max(0,cursor-3)+i
               const cls = realIndex === cursor ? 'line current' : realIndex === cursor+1 ? 'line next' : 'line'
-              const isCurrent = realIndex === cursor
               return (
                 <div key={realIndex} style={{marginBottom:8}}>
                   <div className={cls} style={{whiteSpace:'pre-wrap'}}>
@@ -98,8 +98,8 @@ export default function LyricRenderer({ lines, getPosition, offsetMs, onOffsetCh
                     )}
                   </div>
                   {realIndex===cursor && (
-                    <div className="progress-bar" style={{width:'80%', marginTop:6}}>
-                      <div className="progress-fill" style={{width: `${progress*100}%`}} />
+                    <div className="mt-2">
+                      <ProgressBar now={Math.floor(progress*100)} style={{height:8, borderRadius:6}} variant="primary" />
                     </div>
                   )}
                 </div>
@@ -111,12 +111,12 @@ export default function LyricRenderer({ lines, getPosition, offsetMs, onOffsetCh
 
       {/* Full-track progress bar under lyrics */}
       <div style={{padding:'8px 12px'}}>
-        <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', gap:8, marginBottom:6}}>
+        <div className="d-flex justify-content-between align-items-center mb-2">
           <div className="small">{fmt(rawPos)}</div>
           <div className="small">{durationMs ? fmt(durationMs) : ''}</div>
         </div>
-        <div ref={barRef} onClick={handleBarClick} style={{height:10, background:'var(--border)', borderRadius:6, position:'relative', cursor: durationMs ? 'pointer' : 'default'}}>
-          <div style={{position:'absolute', left:0, top:0, bottom:0, width:`${pct*100}%`, background:'var(--accent)', borderRadius:6}} />
+        <div ref={barRef} onClick={handleBarClick} style={{cursor: durationMs ? 'pointer' : 'default'}}>
+          <ProgressBar now={Math.floor(pct*100)} style={{height:10, borderRadius:6}} variant="info" />
         </div>
       </div>
     </div>
