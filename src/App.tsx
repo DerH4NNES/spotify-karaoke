@@ -294,6 +294,11 @@ function App(){
   const handleLogin = ()=> spotifyAuth.authorize()
   const handleLogout = ()=>{ spotifyAuth.logout(); setReady(false); setAuthChecked(true); setPlayerClient(null); pushMessage('info','Logged out') }
 
+  // Receive library visibility from Controls to avoid duplicating the visibility logic
+  const [controlsLibraryVisible, setControlsLibraryVisible] = useState<boolean>(false)
+  // final library visibility also considers forced library display from App logic
+  const libraryVisible = controlsLibraryVisible || forceShowLibrary
+
   return (
     <div className="app">
      <Toasts messages={messages} onDismiss={dismissMessage} />
@@ -344,33 +349,34 @@ function App(){
             </div>
           )}
           <div style={{padding:'8px'}}>
-            <Controls onRequestPlay={handleRequestPlay} offsetMs={offsetMs} setOffsetMs={setOffsetMs} playerClient={playerClient} ready={ready} isPlayingNow={isPlayingNow} countdown={countdown} deviceModalOpen={deviceModalOpen} />
+            <Controls onRequestPlay={handleRequestPlay} offsetMs={offsetMs} setOffsetMs={setOffsetMs} playerClient={playerClient} ready={ready} isPlayingNow={isPlayingNow} countdown={countdown} deviceModalOpen={deviceModalOpen} onLibraryVisibleChange={setControlsLibraryVisible} />
           </div>
         </div>
-        <div className="right">
-          <div style={{padding:8, display:'flex', flexDirection:'column', gap:12}}>
-            <div style={{display:'flex', gap:8}}>
-              {isPlaying ? (
-                <>
-                  <button className="button" onClick={()=>togglePlayback()}>{isPlayingNow ? 'Pause' : 'Play'}</button>
-                  <button className="button" onClick={()=>seek(-5000)}>-5s</button>
-                  <button className="button" onClick={()=>seek(5000)}>+5s</button>
-                </>
-              ) : null}
-               <button className="button" onClick={toggleFullscreen}>Fullscreen</button>
-             </div>
-             <div>
-               <label className="small">Offset</label>
-               <div style={{display:'flex', gap:8, alignItems:'center'}}>
-                 <button className="button" onClick={()=>setOffsetMs(offsetMs-100)}>-100</button>
-                 <input type="range" min={-2000} max={2000} step={10} value={offsetMs} onChange={e=>setOffsetMs(Number(e.target.value))} style={{flex:1}} />
-                 <button className="button" onClick={()=>setOffsetMs(offsetMs+100)}>+100</button>
-               </div>
-             </div>
-           </div>
-            <TrackInfo meta={trackMeta} deviceId={deviceId} getPosition={getPosition} />
+        {!libraryVisible && (
+          <div className="right">
+           <div style={{padding:8, display:'flex', flexDirection:'column', gap:12}}>
+             <div style={{display:'flex', gap:8}}>
+               {isPlaying ? (
+                 <>
+                   <button className="button" onClick={()=>togglePlayback()}>{isPlayingNow ? 'Pause' : 'Play'}</button>
+                   <button className="button" onClick={()=>seek(-5000)}>-5s</button>
+                   <button className="button" onClick={()=>seek(5000)}>+5s</button>
+                 </>
+               ) : null}
+                <button className="button" onClick={toggleFullscreen}>Fullscreen</button>
+              </div>
+              <div>
+                <label className="small">Offset</label>
+                <div style={{display:'flex', gap:8, alignItems:'center'}}>
+                  <button className="button" onClick={()=>setOffsetMs(offsetMs-100)}>-100</button>
+                  <input type="range" min={-2000} max={2000} step={10} value={offsetMs} onChange={e=>setOffsetMs(Number(e.target.value))} style={{flex:1}} />
+                  <button className="button" onClick={()=>setOffsetMs(offsetMs+100)}>+100</button>
+                </div>
+              </div>
+            </div>
+             <TrackInfo meta={trackMeta} deviceId={deviceId} getPosition={getPosition} />
           </div>
-        </div>
+         )}
         {/* Device selector modal for the play flow */}
         {deviceModalOpen && (
           <div className="modal-overlay" onClick={()=>{ setDeviceModalOpen(false); if(selectionResolveRef.current) selectionResolveRef.current('') }}>
@@ -384,7 +390,8 @@ function App(){
           </div>
         )}
       </div>
-    )
-  }
+    </div>
+  )
+}
 
 export default App
