@@ -7,6 +7,14 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Prevent Spotify SDK AnthemError by ensuring the global callback exists -->
+    <script>
+      // The Spotify Web Playback SDK will try to call window.onSpotifyWebPlaybackSDKReady when loaded.
+      // Define a no-op to avoid an uncaught AnthemError if no handler is registered yet.
+      window.onSpotifyWebPlaybackSDKReady = window.onSpotifyWebPlaybackSDKReady || function() {
+        // no-op: the app code polls for window.Spotify and uses the SDK when available
+      };
+    </script>
     <!-- Spotify Web Playback SDK -->
     <script src="https://sdk.scdn.co/spotify-player.js"></script>
     <script type="module" src="/src/main.tsx"></script>

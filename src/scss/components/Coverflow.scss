@@ -1,0 +1,278 @@
+.cf5-root {
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px 1fr 48px;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+
+.cf5-arrow {
+  height: 48px;
+  width: 48px;
+  border-radius: 999px;
+  border: none;
+  font-size: 28px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0.08));
+  cursor: pointer;
+  transition:
+    transform 0.12s ease,
+    background 0.2s ease,
+    opacity 0.2s ease,
+    box-shadow 0.18s ease;
+  display: inline-grid;
+  place-items: center;
+  color: var(--fg);
+  box-shadow: 0 6px 18px rgba(3, 6, 18, 0.6);
+}
+
+.cf5-arrow:hover {
+  transform: scale(1.08);
+  box-shadow:
+    0 14px 40px rgba(124, 92, 255, 0.14),
+    0 4px 12px rgba(255, 107, 107, 0.06);
+}
+
+.cf5-arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.cf5-viewport {
+  position: relative;
+  overflow: hidden;
+  padding: 20px 8px 24px;
+}
+
+.cf5-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+  align-items: center;
+  /* Grundzustand */
+  transform: translateX(0);
+}
+
+/* Slide-Animation der gesamten 5er-Gruppe */
+.cf5-grid.anim-next {
+  animation: cf5-slide-next 230ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.cf5-grid.anim-prev {
+  animation: cf5-slide-prev 230ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes cf5-slide-next {
+  from {
+    transform: translateX(6%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes cf5-slide-prev {
+  from {
+    transform: translateX(-6%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Fokus-/Zoom-Animationen pro Slot */
+.cf5-slot {
+  transition:
+    transform 220ms ease,
+    opacity 220ms ease,
+    filter 220ms ease;
+  position: relative; /* needed for parent backdrop pseudo-element */
+}
+
+.cf5-slot.side {
+  transform: scale(0.9);
+  opacity: 0.9;
+  filter: saturate(0.9);
+}
+
+.cf5-slot.center {
+  transform: scale(1.06);
+  z-index: 1;
+  opacity: 1;
+  filter: none;
+}
+
+/* Parent backdrop behind each slot: rounded subtle panel behind the cover image */
+.cf5-slot::before {
+  content: '';
+  position: absolute;
+  inset: 6px; /* small padding so image breathes */
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.02); /* light subtle panel */
+  z-index: -1; /* place behind card content */
+  transition:
+    background 160ms ease,
+    transform 160ms ease,
+    opacity 160ms ease;
+  pointer-events: none;
+}
+
+/* stronger neon glow for center */
+.cf5-slot.side::before {
+  opacity: 0.5;
+  transform: scale(0.98);
+}
+
+.cf5-slot.center::before {
+  opacity: 0.98;
+  transform: scale(1);
+  background: linear-gradient(180deg, rgba(139, 92, 255, 0.06), rgba(107, 242, 255, 0.04));
+  box-shadow:
+    0 12px 40px rgba(139, 92, 255, 0.08) inset,
+    0 18px 48px rgba(107, 242, 255, 0.04);
+}
+
+/* add an outer glow ring for the center slot */
+.cf5-slot.center::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 18px;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(139, 92, 255, 0.06), transparent 40%);
+}
+
+/* Bild-„Zoom” smooth, wenn Mitte wechselt */
+.img-zoom-in {
+  transition: transform 260ms ease;
+  transform: scale(1.02);
+}
+
+.img-zoom-out {
+  transition: transform 260ms ease;
+  transform: scale(1);
+}
+
+.cf5-slot.empty {
+  opacity: 0;
+}
+
+.playlist-card {
+  border-radius: 16px;
+  overflow: hidden;
+  transition: box-shadow 220ms ease;
+  /* remove default gray/white background so the cover images sit cleanly on the page */
+  background: transparent !important;
+  border: none !important;
+}
+
+.cf5-slot.center .playlist-card {
+  box-shadow:
+    0 18px 56px rgba(8, 6, 30, 0.45),
+    0 6px 30px rgba(139, 92, 255, 0.09);
+}
+
+.cf5-fade {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+.cf5-fade.left {
+  left: 0;
+}
+
+.cf5-fade.right {
+  right: 0;
+}
+
+.cta-btn {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 1.5rem auto;
+  padding: 0.75rem 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #a18cd1 0%, #fbc2eb 100%);
+  color: #222;
+  border: none;
+  box-shadow: 0 2px 16px rgba(139, 92, 255, 0.08);
+  transition:
+    background 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
+}
+.cta-btn:hover,
+.cta-btn:focus {
+  background: linear-gradient(90deg, #fbc2eb 0%, #a18cd1 100%);
+  color: #111;
+  box-shadow: 0 4px 24px rgba(139, 92, 255, 0.16);
+}
+.cta-btn:active {
+  background: #a18cd1;
+  color: #fff;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  background: linear-gradient(90deg, #a18cd1 0%, #fbc2eb 100%);
+  color: #222;
+  border: none;
+  border-radius: 999px;
+  font-size: 1.08rem;
+  font-weight: 600;
+  padding: 0.5em 1.2em;
+  box-shadow: 0 2px 16px rgba(139, 92, 255, 0.08);
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
+}
+.back-btn:hover,
+.back-btn:focus {
+  background: linear-gradient(90deg, #fbc2eb 0%, #a18cd1 100%);
+  color: #111;
+  box-shadow: 0 4px 24px rgba(139, 92, 255, 0.16);
+}
+.back-btn:active {
+  background: #a18cd1;
+  color: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* keep playlist cards transparent in dark mode as well; adapt slot backdrop color */
+  .playlist-card {
+    background: transparent !important;
+    color: #e6e6e6;
+  }
+  .cf5-slot::before {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .cf5-arrow {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+@media (max-width: 768px) {
+  .cf5-grid {
+    gap: 10px;
+  }
+}
+
+/* Respektiert Bewegungspräferenzen */
+@media (prefers-reduced-motion: reduce) {
+  .cf5-grid,
+  .cf5-slot,
+  .img-zoom-in,
+  .img-zoom-out {
+    animation: none !important;
+    transition: none !important;
+  }
+}

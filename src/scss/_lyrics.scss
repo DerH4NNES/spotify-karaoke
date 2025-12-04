@@ -1,0 +1,101 @@
+// filepath: /home/hannes/projects/sonstiges/karaoke/src/scss/_lyrics.scss
+@import './variables.scss';
+
+/* Lyrics container and text optimized for very large screens (TV) and laptops
+   - Lines are kept on a single line whenever possible (no wrapping)
+   - Font sizes scale with viewport but are clamped to sensible min/max values
+   - Current line is emphasized, next/previous lines are muted
+*/
+.lyrics {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+.lyric-container {
+  width: 96%;
+  background: var(--card-grad);
+  border-radius: var(--radius);
+  padding: clamp(18px, 2.6vw, 44px);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.lyric-content {
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+}
+
+/* single-line lyric styling: stay on one line, scale size with viewport */
+.line {
+  width: 100%;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1;
+  color: var(--muted);
+  font-weight: 600;
+  /* scale from ~28px on phones up to very large sizes on TVs */
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  font-size: clamp(18px, 2.4vw, 32px);
+}
+
+.line.current {
+  /* take the previous .line.next styling but make it slightly brighter */
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 800;
+  /* a medium-large size (between base and previous very large current) */
+  font-size: clamp(18px, 2.4vw, 32px);
+  text-shadow: 0 6px 20px rgba(2, 6, 23, 0.5);
+}
+
+/* word-level highlighting (used by lyric renderer) */
+.word {
+  display: inline-block;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+.word.done {
+  color: rgba(255, 255, 255, 0.85);
+  opacity: 0.95;
+}
+
+.word.current {
+  color: var(--accent-2, #ffd166);
+  font-weight: 800;
+}
+
+/* Ensure small screens still look okay */
+@media (max-width: 700px) {
+  .lyric-container {
+    padding: 14px;
+  }
+  .line {
+    font-size: clamp(18px, 4.4vw, 40px);
+  }
+  .line.current {
+    font-size: clamp(20px, 5.6vw, 48px);
+  }
+  .line.next {
+    font-size: clamp(14px, 3.2vw, 20px);
+  }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .lyric-container,
+  .line,
+  .word {
+    transition: none !important;
+  }
+}

@@ -1,0 +1,112 @@
+.track-detail-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0px 20px;
+  box-sizing: border-box;
+}
+
+.track-detail-wrapper {
+  width: 100%;
+  max-width: 1100px;
+}
+
+.track-detail-heading {
+  font-weight: 700;
+  font-size: 34px;
+  margin: 0;
+}
+
+.track-detail-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 12px 50px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.track-detail-content {
+  text-align: center;
+  width: 100%;
+}
+
+.track-detail-image {
+  width: 420px;
+  height: 420px;
+  object-fit: cover;
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.14);
+  margin-bottom: 32px;
+}
+
+.track-detail-title {
+  font-size: 44px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.track-detail-artist {
+  font-size: 20px;
+  color: #6c757d;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.track-detail-duration {
+  font-size: 18px;
+  color: #495057;
+  margin-bottom: 8px;
+}
+
+.track-detail-meta {
+  font-size: 18px;
+  color: #6c757d;
+  margin-bottom: 6px;
+}
+
+.track-detail-buttons {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.track-detail-buttons .btn {
+  min-width: 220px;
+  padding: 16px 26px;
+  border-radius: 12px;
+  font-size: 18px;
+}
+
+/* Smaller screens */
+@media (max-width: 720px) {
+  .track-detail-card {
+    padding: 28px;
+  }
+  .track-detail-image {
+    width: 260px;
+    height: 260px;
+  }
+  .track-detail-title {
+    font-size: 28px;
+  }
+  .track-detail-artist {
+    font-size: 16px;
+  }
+  .track-detail-duration,
+  .track-detail-meta {
+    font-size: 15px;
+  }
+  .track-detail-buttons .btn {
+    min-width: 140px;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+}

@@ -1,0 +1,52 @@
+// Convenience alias to the project's accent color (fallback to a concrete color for SCSS functions)
+$color: #5a3bff;
+
+// Core
+$body-color: #ffffff; // var(--fg)
+$body-bg: #071021; // var(--bg)
+
+// Typography
+$font-family-base:
+  system-ui,
+  -apple-system,
+  'Segoe UI',
+  Roboto,
+  'Helvetica Neue',
+  Arial,
+  'Noto Sans',
+  'Liberation Sans',
+  sans-serif;
+$font-size-base: 1.125rem; // increased from 1rem for better readability
+$headings-color: #ffffff; // var(--fg)
+
+// Links / accents
+$link-color: #5a3bff; // var(--accent-strong)
+$link-hover-color: #ffd166; // a lighter accent fallback (var(--accent-2) fallback)
+
+// Muted text
+$muted: #9fb2c8; // var(--muted)
+
+// Borders / radius / shadows
+$border-color: rgba(255, 255, 255, 0.12);
+$border-radius: var(--radius);
+
+// Buttons (small adjustments to fit theme)
+$btn-primary-bg: #5a3bff; // var(--accent-strong)
+$btn-primary-color: #ffffff; // var(--fg)
+$btn-border-width: 0px;
+
+// Forms / components
+$input-btn-focus-box-shadow: 0 0 0 0.15rem rgba(90, 59, 255, 0.18);
+
+// Utilities - base sizes
+$spacers: (
+  0: 0,
+  1: 0.25rem,
+  2: 0.5rem,
+  3: 1rem,
+  4: 1.5rem,
+  5: 3rem,
+);
+
+// Ensure Bootstrap emits CSS variables too so runtime themes still work
+$enable-css-custom-properties: true;

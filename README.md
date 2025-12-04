@@ -68,7 +68,7 @@ Authentication notes
 
 Usage notes
 - Device selection: the device chooser shows available devices. Selecting a device will transfer playback without auto-starting it (the server calls the Spotify transfer API with play=false).
-- If the device shown is already the current device, clicking it once more will now still confirm the selection and continue the play flow (this behavior was adjusted in `src/components/DeviceSelector.tsx`).
+- If the device shown is already the current device, clicking it once more will still confirm the selection and continue the play flow (behavior implemented in `src/components/DeviceChooser.tsx`).
 - Play/Pause and seek buttons (+5s/-5s) are only visible when a track is loaded (to avoid confusing controls when nothing is playing).
 
 Keyboard shortcuts
@@ -97,7 +97,7 @@ Troubleshooting
   - Check the dev server console and the token proxy console for errors when exchanging codes.
 
 - Device transfer fails:
-  - The transfer call intentionally uses `play=false` to avoid automatically resuming playback on the target device. If you want to auto-start, change the call in `src/spotify/api.ts` or `src/components/DeviceSelector.tsx`.
+  - The transfer call intentionally uses `play=false` to avoid automatically resuming playback on the target device. If you want to auto-start, change the call in `src/spotify/api.ts` or the device chooser implementation.
   - If you get authorization errors, check that the token exchange succeeded and that scopes provided include playback control scopes (e.g., `user-modify-playback-state`, `user-read-playback-state`, `user-read-currently-playing`).
 
 - No devices found:
@@ -107,7 +107,7 @@ Development notes / pointers
 - Frontend entry: `src/main.tsx`, primary UI: `src/App.tsx`.
 - Player integration: `src/spotify/player` and `src/spotify/api.ts`.
 - Lyrics: `src/lyrics/*` contains parsing and fetching helpers.
-- Device chooser: `src/components/DeviceSelector.tsx` (clicking the already-current device now confirms selection rather than silently returning).
+- Device chooser: `src/components/DeviceChooser.tsx` (device selection now happens in a modal after choosing a song).
 
 If you want further changes (for example: auto-start on transfer, different default redirect URI, or adding a tiny smoke test), tell me which behavior you'd prefer and I can implement it.
 

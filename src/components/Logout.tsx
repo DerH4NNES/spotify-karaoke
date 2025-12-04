@@ -1,29 +1,27 @@
-import {useProviderContext} from "../providers/ProviderContext";
-import React from "react";
+import React, { useState } from 'react';
+import { sdk } from '../spotify/api';
+import { useTranslation } from 'react-i18next';
 
-export function Auth() {
+export function Logout() {
+  const [ready, setReady] = useState(true);
+  const { t } = useTranslation();
 
-    const {ready, authChecked, setReady, setAuthChecked, setPlayerClient, provider} = useProviderContext()
-
-    const handleLogout = () => {
-        try {
-            if (provider && typeof provider.logout === 'function') provider.logout()
-            else console.warn('No provider logout() available')
-        } catch (e) {
-            console.warn('logout failed', e)
-        }
-        // update hook state
-        if (setReady) setReady(false)
-        if (setAuthChecked) setAuthChecked(true)
-        if (setPlayerClient) setPlayerClient(null)
+  const handleLogout = () => {
+    try {
+      sdk.logOut();
+    } catch (e) {
+      console.warn('logout failed', e);
     }
+    if (setReady) setReady(false);
+  };
 
-    return(
-        <div className="ms-auto d-flex gap-2">
-        {ready && authChecked && (
-            <button className="btn btn-outline-secondary" onClick={handleLogout}>
-                Logout
-            </button>
-        )}
-    </div>);
+  return (
+    <div className="position-absolute m-2 p-0">
+      {ready && (
+        <button className="btn btn-outline-primary" onClick={handleLogout}>
+          {t('logout')}
+        </button>
+      )}
+    </div>
+  );
 }

@@ -1,0 +1,47 @@
+/* Component SCSS variables (imported by index.scss) */
+:root {
+  /* Background & foreground */
+  --bg: #071021; /* deep navy */
+  --bg-2:
+    radial-gradient(800px 300px at 10% 10%, rgba(124, 92, 255, 0.05), transparent),
+    linear-gradient(180deg, #041127, #071021);
+  /* card background: slightly lighter than page background to improve contrast for text */
+  --card-grad: linear-gradient(180deg, rgba(18, 26, 40, 0.98), rgba(12, 20, 34, 0.99));
+
+  /* Text colors: increase contrast */
+  --fg: #ffffff; /* pure white for highest contrast */
+  --muted: #9fb2c8; /* tuned muted: good contrast with bg, better visual hierarchy */
+
+  /* Playful accents (use gradients for more color) */
+  --accent-1: #ff6b6b; /* coral */
+  --accent-2: #ffd166; /* amber */
+  --accent-3: #6bf2ff; /* cyan */
+  --accent-4: #8b5cff; /* violet */
+  --accent-grad: linear-gradient(90deg, var(--accent-4), var(--accent-2), var(--accent-3));
+  --accent: var(--accent-grad);
+  --accent-strong: #5a3bff;
+
+  /* Neon/glow variants */
+  --neon-1: rgba(255, 107, 107, 0.24);
+  --neon-2: rgba(107, 242, 255, 0.18);
+  --neon-3: rgba(139, 92, 255, 0.2);
+
+  --border: rgba(255, 255, 255, 0.14);
+  --glass: rgba(255, 255, 255, 0.04);
+  --radius: 14px;
+  --shadow-soft: 0 12px 48px rgba(2, 6, 23, 0.65);
+  --shadow-neon: 0 10px 48px rgba(124, 92, 255, 0.18), 0 3px 10px rgba(255, 107, 107, 0.08);
+
+  /* Bootstrap runtime variable mappings to follow theme */
+  --bs-body-color: var(--fg);
+  --bs-body-bg: var(--bg);
+  --bs-link-color: var(--accent-strong);
+  --bs-body-font-size: 1rem;
+}
+
+//@media (prefers-color-scheme: light) {
+//  :root {
+//    --bg: #f6f8ff;
+//    --fg: #071021;
+//  }
+//}

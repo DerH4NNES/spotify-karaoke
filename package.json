@@ -7,20 +7,41 @@
     "build": "vite build",
     "preview": "vite preview",
     "server": "node server/index.js",
-    "test": "vitest"
+    "test": "vitest",
+    "prepare": "husky install",
+    "lint": "eslint --config eslint.config.cjs --ext .js,.jsx,.ts,.tsx src/",
+    "lint:fix": "eslint --fix --config eslint.config.cjs --ext .js,.jsx,.ts,.tsx src/",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,css,scss,json,md}\"",
+    "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,css,scss,json,md}\""
   },
   "dependencies": {
+    "@spotify/web-api-ts-sdk": "^1.2.0",
     "bootstrap": "^5.3.2",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "i18next": "^25.7.1",
+    "i18next-browser-languagedetector": "^8.2.0",
     "react": "18.2.0",
     "react-bootstrap": "^2.8.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "react-i18next": "^16.3.5",
+    "react-icons": "^5.5.0",
+    "react-router-dom": "^6.14.1",
+    "sass": "^1.93.2"
   },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
+    "@typescript-eslint/eslint-plugin": "^8.48.1",
+    "@typescript-eslint/parser": "^8.48.1",
     "@vitejs/plugin-react": "^4.0.0",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.7.4",
     "typescript": "5.2.2",
     "vite": "5.2.0",
     "vitest": "^1.2.4"
@@ -28,5 +49,11 @@
   "description": "Vite + React + TypeScript Karaoke app that uses the Spotify Web Playback SDK and LRCLIB to render synced lyrics.",
   "main": "index.js",
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
+  }
 }

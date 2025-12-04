@@ -1,0 +1,40 @@
+/* header styles */
+@import './variables.scss';
+
+.header {
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+  backdrop-filter: blur(6px);
+}
+
+.header .page-title {
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  color: var(--fg);
+  text-shadow: 0 6px 18px rgba(139, 92, 255, 0.06);
+}
+
+.header .small {
+  color: var(--muted);
+}
+
+/* make header buttons more visible and consistent with theme */
+.header .btn {
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-weight: 600;
+}
+
+.header .btn.btn-primary {
+  box-shadow: 0 8px 30px rgba(90, 59, 255, 0.12);
+}
+
+.header .btn:focus-visible {
+  box-shadow:
+    0 8px 36px rgba(139, 92, 255, 0.14),
+    0 0 0 4px rgba(139, 92, 255, 0.08);
+}

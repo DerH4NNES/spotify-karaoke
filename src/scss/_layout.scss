@@ -1,0 +1,28 @@
+/* layout styles: main columns and responsive */
+@import './variables.scss';
+
+.lyrics {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lyric-container {
+  width: 92%;
+  max-width: 1200px;
+  background: var(--card-grad);
+  border-radius: var(--radius);
+  padding: 26px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+@media (max-width: 900px) {
+  .right {
+    display: none;
+  }
+  .lyric-container {
+    padding: 20px;
+  }
+}

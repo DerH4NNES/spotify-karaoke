@@ -1,0 +1,365 @@
+/* small components: buttons, listgroups, toasts */
+@import './variables.scss';
+
+/* Buttons */
+.btn-primary {
+  background: var(--accent);
+  background-size: 240% 100%;
+  border: none;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-neon);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.18s ease,
+    background-position 0.6s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  background-position: 100% 0;
+}
+
+.btn-outline-secondary {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--fg);
+  padding: 6px 10px;
+  border-radius: 10px;
+}
+
+.list-group-item {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  margin-bottom: 6px;
+}
+
+.list-group-item.active {
+  background: var(--accent);
+  border-color: transparent;
+  box-shadow: 0 8px 30px rgba(88, 54, 255, 0.12);
+}
+
+.toast-container {
+  z-index: 1100;
+}
+
+/* Game-like controls bar (used by Controls.tsx) */
+.game-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(7, 10, 20, 0.06));
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: 0 6px 30px rgba(4, 6, 20, 0.6);
+}
+
+.gc-button {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  border: none;
+  display: inline-grid;
+  place-items: center;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0.08));
+  color: var(--fg);
+  font-size: 18px;
+  cursor: pointer;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.gc-button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+}
+
+.gc-button.play {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 10px 30px rgba(90, 59, 255, 0.16);
+}
+
+.gc-button.play:hover {
+  filter: brightness(1.04);
+}
+
+/* playing pulse animation for play button */
+@keyframes gc-pulse {
+  0% {
+    box-shadow:
+      0 8px 30px rgba(90, 59, 255, 0.16),
+      0 0 0 0 rgba(139, 92, 255, 0.08);
+    transform: translateY(0);
+  }
+  50% {
+    box-shadow:
+      0 18px 44px rgba(90, 59, 255, 0.22),
+      0 0 0 8px rgba(139, 92, 255, 0.06);
+    transform: translateY(-2px);
+  }
+  100% {
+    box-shadow:
+      0 8px 30px rgba(90, 59, 255, 0.16),
+      0 0 0 0 rgba(139, 92, 255, 0.08);
+    transform: translateY(0);
+  }
+}
+
+.gc-button.play.playing {
+  animation: gc-pulse 1.4s ease-in-out infinite;
+  background: linear-gradient(90deg, rgba(139, 92, 255, 0.95), rgba(255, 209, 102, 0.92));
+  color: white;
+}
+
+.gc-track {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 220px;
+  max-width: 720px;
+}
+
+.gc-progress {
+  height: 8px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.gc-progress .bar {
+  height: 100%;
+  background: var(--accent);
+  width: 0;
+  transition: width 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 6px 18px rgba(90, 59, 255, 0.12);
+}
+
+.gc-times {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Ensure text-muted uses our muted variable for better contrast */
+.text-muted {
+  color: var(--muted) !important;
+}
+
+/* Strong focus outlines and visible focus state for interactive controls */
+:focus {
+  outline: none;
+}
+
+:focus-visible,
+.gc-button:focus-visible,
+.btn:focus-visible {
+  box-shadow:
+    0 6px 30px rgba(90, 59, 255, 0.16),
+    0 0 0 4px rgba(139, 92, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+/* progress slider focus state */
+.gc-progress:focus {
+  box-shadow:
+    0 6px 24px rgba(107, 242, 255, 0.08) inset,
+    0 0 0 4px rgba(107, 242, 255, 0.08);
+  border-radius: 999px;
+}
+
+/* Improve contrast for small text labels within controls */
+.game-controls .small,
+.gc-times {
+  color: var(--muted);
+}
+
+/* ensure buttons have visible focus ring on keyboard navigation */
+.gc-button:focus {
+  outline: none;
+}
+
+/* Small responsive tweaks */
+@media (max-width: 700px) {
+  .gc-button {
+    width: 46px;
+    height: 46px;
+  }
+  .game-controls {
+    padding: 10px;
+  }
+}
+
+/* TrackInfo card: clearer contrast and readable typography */
+.track-info-card {
+  background: var(--card-grad);
+  border-radius: 12px;
+  padding: 10px;
+  color: var(--fg);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: var(--shadow-soft);
+}
+
+.track-info-card .cover-img {
+  width: 84px;
+  height: 84px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+}
+
+.track-info-card .track-title {
+  font-size: 15px;
+  color: var(--fg);
+  font-weight: 700;
+}
+
+.track-info-card .track-artists {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.track-info-card .track-album {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.track-info-card .track-meta {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* Playlist card tweaks for better visibility */
+.playlist-card {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(7, 8, 18, 0.06));
+}
+
+.playlist-card .card-img-top {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.playlist-card .card-body {
+  padding: 10px;
+}
+
+.playlist-card .fw-bold {
+  color: var(--fg);
+  font-weight: 700;
+  text-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.playlist-card .small {
+  color: var(--muted);
+}
+
+/* Track card (used in CoverflowTracks) */
+.track-card {
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.015), rgba(0, 0, 0, 0.06));
+  padding: 10px;
+  min-width: 120px;
+}
+
+.track-card .fw-bold {
+  color: var(--fg);
+  font-weight: 700;
+}
+
+.track-card .small {
+  color: var(--muted);
+}
+
+.track-card .btn {
+  margin-top: 8px;
+}
+
+/* Coverflow slot focus visibility (high contrast ring) */
+.cf5-slot:focus {
+  outline: none;
+  box-shadow:
+    0 10px 40px rgba(107, 242, 255, 0.08),
+    0 0 0 6px rgba(107, 242, 255, 0.06);
+  transform: translateY(-4px);
+}
+
+.cf5-slot:focus .playlist-card,
+.cf5-slot:focus .track-card {
+  transform: translateY(-4px);
+}
+
+/* Toast visual overrides to match game theme and improve readability */
+.toast {
+  border-radius: 12px;
+  color: var(--fg);
+  overflow: hidden;
+}
+
+.toast .toast-header {
+  background: rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.toast.bg-danger .toast-header,
+.toast.bg-danger .toast-body {
+  background: linear-gradient(90deg, rgba(255, 80, 90, 0.14), rgba(139, 92, 255, 0.06));
+  color: #fff;
+}
+
+.toast.bg-warning .toast-header,
+.toast.bg-warning .toast-body {
+  background: linear-gradient(90deg, rgba(255, 209, 102, 0.12), rgba(107, 242, 255, 0.02));
+  color: #071021;
+}
+
+.toast.bg-info .toast-header,
+.toast.bg-info .toast-body {
+  background: linear-gradient(90deg, rgba(107, 242, 255, 0.12), rgba(139, 92, 255, 0.04));
+  color: #071021;
+}
+
+.toast .me-auto {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.toast .btn-close {
+  filter: invert(1);
+}
+
+/* Fixed app footer for Controls */
+.app-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none; /* allow inner controls to receive events */
+  z-index: 1050;
+}
+
+.app-footer .container {
+  pointer-events: all;
+  max-width: 1100px;
+}
+
+/* ensure main content isn't hidden behind the footer */
+.main {
+}

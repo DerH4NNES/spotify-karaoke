@@ -1,124 +1,133 @@
-import React, { useEffect, useRef, useState } from 'react'
-import type { LrcLine } from '../lyrics/parseLrc'
-import { ProgressBar } from 'react-bootstrap'
+import React, { useEffect, useState } from 'react';
+import type { LrcLine } from '../lyrics/parseLrc';
+import '../scss/components/lyric-renderer.scss';
+import { ProgressBar } from 'react-bootstrap';
+import { getCurrentLyricCursor } from '../lyrics/lyricUtils';
 
 type Props = {
-  lines: LrcLine[]
-  getPosition: ()=>Promise<number>
-  offsetMs: number
-  onOffsetChange?: (v:number)=>void
-  durationMs?: number
-  onSeek?: (ms:number)=>void
-  initialProgressMs?: number
-}
+  lines: LrcLine[];
+  currentPositionMs?: number;
+  offsetMs: number;
+  durationMs?: number;
+  onSeek?: (ms: number) => void;
+  initialProgressMs?: number;
+};
 
-export default function LyricRenderer({ lines, getPosition, offsetMs, onOffsetChange, durationMs, onSeek, initialProgressMs = 0 }: Props){
-  const [cursor, setCursor] = useState(0)
-  const [progress, setProgress] = useState(0)
-  const [currentTime, setCurrentTime] = useState(0)
-  const [rawPos, setRawPos] = useState(0)
-  const rafRef = useRef<number | null>(null)
-  const barRef = useRef<HTMLDivElement | null>(null)
+export default function LyricRenderer({
+  lines,
+  currentPositionMs = 0,
+  offsetMs,
+  onSeek,
+  initialProgressMs = 0,
+}: Props) {
+  const [cursor, setCursor] = useState(0);
+  const [progress, setProgress] = useState(0);
 
-  useEffect(()=>{
-    let mounted = true
-    // initialize with given initial progress (ms) so UI shows 0 before playback starts
-    if(initialProgressMs != null){
-      setRawPos(initialProgressMs)
-      setCurrentTime(initialProgressMs + offsetMs)
+  useEffect(() => {
+    const currentTimeMs =
+      (typeof currentPositionMs === 'number' ? currentPositionMs : initialProgressMs) + offsetMs;
+    if (!Array.isArray(lines) || lines.length === 0) {
+      setCursor(0);
+      setProgress(0);
+      return;
     }
-    async function loop(){
-      try{
-        const pos = await getPosition()
-        const posNum = (pos || 0)
-        setRawPos(posNum)
-        const t = (posNum + offsetMs)
-        setCurrentTime(t)
-        if(lines.length>0){
-          let idx = 0
-          for(let i=0;i<lines.length;i++){
-            if(t >= lines[i].tStart && t < lines[i].tEnd){ idx = i; break }
-            if(t >= lines[lines.length-1].tStart) idx = lines.length-1
-          }
-          const cur = lines[idx]
-          const p = cur ? Math.max(0, Math.min(1, (t - cur.tStart)/(cur.tEnd - cur.tStart))) : 0
-          if(mounted){ setCursor(idx); setProgress(p) }
-        } else {
-          if(mounted){ setCursor(0); setProgress(0) }
-        }
-      }catch(e){ console.warn('pos err', e) }
-      rafRef.current = requestAnimationFrame(loop)
+    const cursorIndex = getCurrentLyricCursor(lines, currentTimeMs);
+    const currentLine = lines[cursorIndex];
+    const lineStartMs = Number(currentLine?.tStart) || 0;
+    const lineEndMs = Number(currentLine?.tEnd) || lineStartMs;
+    const progressValue =
+      lineEndMs > lineStartMs
+        ? Math.max(0, Math.min(1, (currentTimeMs - lineStartMs) / (lineEndMs - lineStartMs)))
+        : 0;
+    setCursor(cursorIndex);
+    setProgress(progressValue);
+  }, [lines, currentPositionMs, offsetMs, initialProgressMs]);
+
+  const renderWords = (ln: LrcLine, realIndex: number, t: number) => {
+    try {
+      if (!ln || !Array.isArray(ln.words) || ln.words.length === 0) {
+        // Zeige "-leer-" wenn der Text leer ist
+        return <>{ln?.text?.trim() ? ln.text : '<music>'}</>;
+      }
+
+      return (
+        <>
+          {ln.words.map((w, wi) => {
+            const start = Number(w?.start) || 0;
+            const end = Number(w?.end) || start;
+            const done = t >= end;
+            const isWordCurrent = t >= start && t < end;
+            const wordCls = done ? 'done' : isWordCurrent ? 'highlight' : '';
+            const handleWordClick = () => {
+              if (typeof onSeek === 'function') onSeek(Math.max(0, start - offsetMs));
+            };
+            return (
+              <div
+                key={`${realIndex}-${wi}`}
+                className={`lyric-word ${wordCls} me-2 ${onSeek ? 'clickable' : ''}`}
+                onClick={handleWordClick}
+                role={onSeek ? 'button' : undefined}
+                aria-label={w?.word ?? ''}
+                tabIndex={onSeek ? 0 : -1}
+              >
+                {String(w?.word ?? '')}
+              </div>
+            );
+          })}
+        </>
+      );
+    } catch (e) {
+      console.error('LyricRenderer: failed to render words for line', e, ln);
+      return <>{ln?.text ?? ''}</>;
     }
-    rafRef.current = requestAnimationFrame(loop)
-    return ()=>{ mounted=false; if(rafRef.current) cancelAnimationFrame(rafRef.current) }
-  },[lines, getPosition, offsetMs])
+  };
 
-  function fmt(ms:number){
-    const s = Math.max(0, Math.floor(ms/1000))
-    const m = Math.floor(s/60)
-    const sec = s%60
-    return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`
-  }
-
-  function handleBarClick(e: React.MouseEvent){
-    if(!durationMs || !barRef.current || !onSeek) return
-    const rect = barRef.current.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const pct = Math.max(0, Math.min(1, x / rect.width))
-    const target = Math.floor(pct * durationMs)
-    try{ onSeek(target) }catch(e){ console.warn('seek failed', e) }
-  }
-
-  const pct = durationMs ? Math.max(0, Math.min(1, rawPos / durationMs)) : 0
+  const pct = Math.round(Math.max(0, Math.min(1, progress)) * 100);
 
   return (
-    <div>
-      <div style={{height:'70vh', display:'flex', flexDirection:'column', justifyContent:'center'}}>
-        {lines.length===0 ? (
-          <div style={{textAlign:'center'}} className="small">Keine synchronisierten Lyrics gefunden.</div>
-        ) : (
-          <div>
-            {lines.slice(Math.max(0,cursor-3), cursor+6).map((ln, i)=>{
-              const realIndex = Math.max(0,cursor-3)+i
-              const cls = realIndex === cursor ? 'line current' : realIndex === cursor+1 ? 'line next' : 'line'
-              return (
-                <div key={realIndex} style={{marginBottom:8}}>
-                  <div className={cls} style={{whiteSpace:'pre-wrap'}}>
-                    {ln.words && ln.words.length > 0 ? (
-                      <span>
-                        {ln.words.map((w, wi)=>{
-                          const done = currentTime >= w.end
-                          const isWordCurrent = currentTime >= w.start && currentTime < w.end
-                          const wordCls = done ? 'word done' : isWordCurrent ? 'word current' : 'word'
-                          return <span key={wi} className={wordCls} style={{marginRight:6}}>{w.word}</span>
-                        })}
-                      </span>
-                    ) : (
-                      <span>{ln.text}</span>
-                    )}
-                  </div>
-                  {realIndex===cursor && (
-                    <div className="mt-2">
-                      <ProgressBar now={Math.floor(progress*100)} style={{height:8, borderRadius:6}} variant="primary" />
-                    </div>
+    <div className="lyric-renderer d-flex flex-column justify-content-center">
+      {!Array.isArray(lines) || lines.length === 0 ? (
+        <div className="lyric-empty text-center small">Keine synchronisierten Lyrics gefunden.</div>
+      ) : (
+        <div className="lyric-list mw-100 text-center">
+          {lines.slice(Math.max(0, cursor - 3), cursor + 6).map((ln, i) => {
+            const realIndex = Math.max(0, cursor - 3) + i;
+            const isCurrent = realIndex === cursor;
+            const isNext = realIndex === cursor + 1;
+            return (
+              <div
+                key={realIndex}
+                className={`lyric-line ${isCurrent ? 'current text-white fw-bolder' : isNext ? 'text-white' : 'text-white-50'} mb-3`}
+              >
+                <div
+                  aria-live={isCurrent ? 'polite' : undefined}
+                  aria-atomic={isCurrent ? true : undefined}
+                  className={
+                    isCurrent
+                      ? 'fw-bold fs-1 text-center bg-white bg-opacity-10 shadow-sm py-2 px-4'
+                      : isNext
+                        ? 'fs-2 text-center text-white-50'
+                        : 'fs-3 text-center text-white-75'
+                  }
+                >
+                  {renderWords(
+                    ln,
+                    realIndex,
+                    (typeof currentPositionMs === 'number'
+                      ? currentPositionMs
+                      : initialProgressMs) + offsetMs
                   )}
                 </div>
-              )
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Full-track progress bar under lyrics */}
-      <div style={{padding:'8px 12px'}}>
-        <div className="d-flex justify-content-between align-items-center mb-2">
-          <div className="small">{fmt(rawPos)}</div>
-          <div className="small">{durationMs ? fmt(durationMs) : ''}</div>
+                {isCurrent && (
+                  <div className="mt-2">
+                    <ProgressBar now={pct} min={0} max={100} variant="primary" />
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
-        <div ref={barRef} onClick={handleBarClick} style={{cursor: durationMs ? 'pointer' : 'default'}}>
-          <ProgressBar now={Math.floor(pct*100)} style={{height:10, borderRadius:6}} variant="info" />
-        </div>
-      </div>
+      )}
     </div>
-  )
+  );
 }
