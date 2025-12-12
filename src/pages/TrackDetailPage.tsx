@@ -40,7 +40,7 @@ export default function TrackDetailPage() {
 
   return (
     <>
-      <PageHeader title={t('trackDetails')} buttons={<BackButton to="/spotify/playlists" />} />
+      <PageHeader title={t('trackDetails')} buttons={<BackButton to="/playlists" />} />
       <section
         aria-labelledby="track-detail-head"
         className="track-detail-section"
@@ -88,7 +88,7 @@ export default function TrackDetailPage() {
                   <Button
                     variant="primary"
                     size="lg"
-                    onClick={() => navigate(`/spotify/playlists/${playlistId}/${trackId}/play`)}
+                    onClick={() => navigate(`/playlists/${playlistId}/${trackId}/play`)}
                   >
                     ▶ {t('play')}
                   </Button>

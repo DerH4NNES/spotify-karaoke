@@ -5,31 +5,25 @@ import PlaylistPage from './pages/PlaylistPage';
 import TrackPage from './pages/TrackPage';
 import TrackDetailPage from './pages/TrackDetailPage';
 import PlayPage from './pages/PlayPage';
-import ProviderPage from './pages/ProviderPage';
 import CallbackPage from './pages/CallbackPage';
 
 export const AppRoutes: React.FC<any> = (props) => {
   return (
     <Routes>
-      {/* provider choice */}
-      <Route path="/" element={<ProviderPage />} />
+      {/* root: show login page (login only on '/') */}
+      <Route path="/" element={<LoginPage />} />
       {/* callback route for OAuth redirects */}
       <Route path="/callback" element={<CallbackPage />} />
-      {/* provider login: /:provider */}
-      <Route path="/:provider" element={<LoginPage />} />
-      {/* playlist listing for provider: /:provider/playlists */}
-      <Route path="/:provider/playlists" element={<PlaylistPage />} />
-      {/* track listing for playlist: /:provider/playlists/:playlistId */}
-      <Route path="/:provider/playlists/:playlistId" element={<TrackPage />} />
-      {/* track detail page: /:provider/playlists/:playlistId/:trackId */}
-      <Route path="/:provider/playlists/:playlistId/:trackId" element={<TrackDetailPage />} />
-      {/* play page: /:provider/playlists/:playlistId/:trackId/play */}
-      <Route
-        path="/:provider/playlists/:playlistId/:trackId/play"
-        element={<PlayPage {...props} />}
-      />
+      {/* playlist listing */}
+      <Route path="/playlists" element={<PlaylistPage />} />
+      {/* track listing for playlist */}
+      <Route path="/playlists/:playlistId" element={<TrackPage />} />
+      {/* track detail page */}
+      <Route path="/playlists/:playlistId/:trackId" element={<TrackDetailPage />} />
+      {/* play page (playlist context) */}
+      <Route path="/playlists/:playlistId/:trackId/play" element={<PlayPage {...props} />} />
+      {/* standalone play route */}
+      <Route path="/play/:trackId" element={<PlayPage {...props} />} />
     </Routes>
   );
 };
-
-export default AppRoutes;

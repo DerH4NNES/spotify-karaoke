@@ -6,7 +6,8 @@ import './i18n';
 
 function App() {
   const location = useLocation();
-  const showLogout = /^\/spotify(\/?$|$)/.test(location.pathname);
+  // Show logout on app routes (playlists / play pages). Previously this checked for '/spotify'
+  const showLogout = /^(\/play|\/playlists|\/tracks)/.test(location.pathname);
   return (
     <div className="app">
       {showLogout && <Logout />}

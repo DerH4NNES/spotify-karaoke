@@ -11,7 +11,7 @@ export default function LoginPage() {
   const handleLogin = () => {
     sdk.authenticate().then((data) => {
       if (data.authenticated) {
-        navigate('/spotify/playlists');
+        navigate('/playlists');
       }
     });
   };

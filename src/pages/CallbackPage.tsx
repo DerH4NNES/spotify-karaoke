@@ -78,7 +78,7 @@ export default function CallbackPage() {
           // now call sdk.authenticate to pick up token from cache
           const data = await sdk.authenticate();
           if (data && data.authenticated) {
-            navigate('/spotify/playlists');
+            navigate('/playlists');
           } else {
             setError('Authentication failed after server exchange');
           }
@@ -109,10 +109,10 @@ export default function CallbackPage() {
       .then((data: any) => {
         if (!mounted) return;
         if (data && data.authenticated) {
-          navigate('/spotify/playlists');
+          navigate('/playlists');
         } else {
-          // Not authenticated -> go back to provider selection / login
-          navigate('/spotify');
+          // Not authenticated -> go back to root (login)
+          navigate('/');
         }
       })
       .catch((e: any) => {
@@ -137,7 +137,7 @@ export default function CallbackPage() {
         <div className="text-danger small">
           {error}
           <div className="mt-2">
-            <button className="btn btn-outline-secondary me-2" onClick={() => navigate('/spotify')}>
+            <button className="btn btn-outline-secondary me-2" onClick={() => navigate('/')}>
               {t('retryLogin')}
             </button>
             <button className="btn btn-outline-secondary" onClick={() => navigate('/')}>

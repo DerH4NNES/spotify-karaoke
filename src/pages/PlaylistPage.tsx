@@ -7,6 +7,7 @@ import { loadPlaylists, removePlaylist } from '../spotify/playlistService';
 import PageHeader from '../components/PageHeader';
 import BackButton from '../components/BackButton';
 import PlaylistCreateBox from '../components/PlaylistCreateBox';
+import TrackSearchBox from '../components/TrackSearchBox';
 import { useTranslation } from 'react-i18next';
 
 export default function PlaylistPage() {
@@ -52,6 +53,13 @@ export default function PlaylistPage() {
         buttons={
           <>
             <PlaylistCreateBox onCreated={() => setPlaylists(loadPlaylists())} />
+            {/* Track search button: open search and navigate to PlayPage on selection */}
+            <TrackSearchBox
+              onSelectTrack={(track: any) => {
+                // navigate to the new standalone play route
+                navigate(`/play/${track.id}`);
+              }}
+            />
             <BackButton to="/" />
           </>
         }
@@ -59,12 +67,11 @@ export default function PlaylistPage() {
       <div className="mt-3">
         <CoverflowPlaylists
           playlists={playlists}
-          openAndLoadTracks={(pl: any) => navigate(`/spotify/playlists/${pl.id}`)}
+          openAndLoadTracks={(pl: any) => navigate(`/playlists/${pl.id}`)}
           onRequestDelete={(pl: any) => {
             setPendingDelete(pl);
             setConfirmOpen(true);
           }}
-          onDelete={() => setPlaylists(loadPlaylists())}
         />
       </div>
 

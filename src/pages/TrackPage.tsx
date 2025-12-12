@@ -11,7 +11,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import { removeTrackFromPlaylist } from '../spotify/playlistService';
 
 export default function TrackPage() {
-  const { provider: providerParam, playlistId } = useParams();
+  const { playlistId } = useParams();
   const [tracks, setTracks] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,8 +58,6 @@ export default function TrackPage() {
     );
   if (error) return <div className="small text-danger">{t('failedToLoadTracks', { error })}</div>;
 
-  const prov = providerParam || 'spotify';
-
   return (
     <section aria-labelledby="tracks-head" style={{ position: 'relative' }}>
       <PageHeader
@@ -71,7 +69,7 @@ export default function TrackPage() {
               onSelectTrack={handleAddTrack}
               excludeTrackIds={tracks.map((t) => t.id)}
             />
-            <BackButton to="/spotify/playlists" />
+            <BackButton to="/playlists" />
           </>
         }
       />
@@ -80,7 +78,7 @@ export default function TrackPage() {
         closeModal={() => {}}
         onSelectTrack={(t: any) => {
           if (!playlistId) return;
-          navigate(`/${prov}/playlists/${playlistId}/${t.id}`);
+          navigate(`/playlists/${playlistId}/${t.id}`);
         }}
         playlistId={playlistId}
         onDeleteTrack={(trackId: string) =>

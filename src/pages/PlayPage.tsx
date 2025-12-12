@@ -148,7 +148,7 @@ export default function SpotifyPlayPage() {
   const handleGoToPlaylistOverview = () => {
     setShowEndOverlay(false);
     // navigate to spotify playlists overview
-    navigate('/spotify/playlists');
+    navigate('/playlists');
   };
 
   // Seek Controls
