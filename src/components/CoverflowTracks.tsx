@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-import CoverflowBase from './CoverflowBase';
+import Coverflow from './coverflow/Coverflow';
 
 type Track = {
   id: string;
@@ -14,20 +14,31 @@ export default function CoverflowTracks({
   tracks,
   onSelectTrack,
   closeModal,
+  playlistId,
+  onDeleteTrack,
+  onItemContextMenu,
+  onRequestDelete,
   loop = true,
 }: {
   tracks: Track[];
   // onSelectTrack is called when the user activates a track (for navigation/play handling)
   onSelectTrack: (t: Track) => void;
   closeModal: () => void;
+  playlistId?: string;
+  onDeleteTrack?: (trackId: string) => void;
+  onItemContextMenu?: (e: React.MouseEvent, item: any) => void;
+  onRequestDelete?: (track: any) => void;
   loop?: boolean;
 }) {
   const { t } = useTranslation();
   return (
-    <CoverflowBase
+    <Coverflow
       items={tracks as any}
       loop={loop}
       ariaLabel={t('tracks')}
+      visibleRange={2}
+      animationMs={230}
+      onItemContextMenu={onItemContextMenu}
       renderItem={(tRaw: any, idx, { isCenter }) => {
         const trackItem = tRaw as Track;
         return (
@@ -67,9 +78,6 @@ export default function CoverflowTracks({
           </div>
         );
       }}
-      // do NOT pass onActivateCenter to avoid auto-playing on Enter/Click center
-      visibleRange={2}
-      animationMs={230}
     />
   );
 }

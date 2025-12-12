@@ -15,6 +15,16 @@
   "failedToLoadPlaylists": "Failed to load playlists: {{error}}",
   "addPlaylist": "Add playlist",
   "playlistName": "Playlist name...",
+  "coverImage": "Cover image",
+  "remove": "Remove",
+  "confirm": {
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "deletePlaylistTitle": "Delete playlist \"{{name}}\"?",
+    "deletePlaylistMessage": "Are you sure you want to delete the playlist \"{{name}}\"? This cannot be undone.",
+    "deleteTrackTitle": "Delete track \"{{name}}\"?",
+    "deleteTrackMessage": "Are you sure you want to delete the track \"{{name}}\" from this playlist?"
+  },
   "create": "Create",
   "creating": "Creating...",
   "cancel": "Cancel",

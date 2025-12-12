@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import CoverflowPlaylists from '../components/CoverflowPlaylist';
-import { loadPlaylists } from '../spotify/playlistService';
+import ConfirmModal from '../components/ConfirmModal';
+import { loadPlaylists, removePlaylist } from '../spotify/playlistService';
 import PageHeader from '../components/PageHeader';
 import BackButton from '../components/BackButton';
 import PlaylistCreateBox from '../components/PlaylistCreateBox';
@@ -12,6 +13,8 @@ export default function PlaylistPage() {
   const [playlists, setPlaylists] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<any | null>(null);
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -57,8 +60,37 @@ export default function PlaylistPage() {
         <CoverflowPlaylists
           playlists={playlists}
           openAndLoadTracks={(pl: any) => navigate(`/spotify/playlists/${pl.id}`)}
+          onRequestDelete={(pl: any) => {
+            setPendingDelete(pl);
+            setConfirmOpen(true);
+          }}
+          onDelete={() => setPlaylists(loadPlaylists())}
         />
       </div>
+
+      <ConfirmModal
+        show={confirmOpen}
+        title={
+          pendingDelete ? t('confirm.deletePlaylistTitle', { name: pendingDelete.name }) : undefined
+        }
+        message={
+          pendingDelete
+            ? t('confirm.deletePlaylistMessage', { name: pendingDelete.name })
+            : undefined
+        }
+        onConfirm={() => {
+          if (pendingDelete) {
+            removePlaylist(pendingDelete.id);
+            setPlaylists(loadPlaylists());
+          }
+          setPendingDelete(null);
+          setConfirmOpen(false);
+        }}
+        onCancel={() => {
+          setPendingDelete(null);
+          setConfirmOpen(false);
+        }}
+      />
     </section>
   );
 }

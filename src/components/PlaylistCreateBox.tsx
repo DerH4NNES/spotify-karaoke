@@ -12,8 +12,24 @@ export default function PlaylistCreateBox({ onCreated, disabled }: PlaylistCreat
   const [playlistName, setPlaylistName] = useState('');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [coverDataUrl, setCoverDataUrl] = useState<string | null>(null);
+  const [coverFileName, setCoverFileName] = useState<string | null>(null);
+  const textInputRef = useRef<HTMLInputElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { t } = useTranslation();
+
+  function fileToDataUrl(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string | ArrayBuffer | null;
+        if (typeof result === 'string') resolve(result);
+        else reject(new Error('Unsupported file result'));
+      };
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsDataURL(file);
+    });
+  }
 
   async function handleCreate(e?: React.FormEvent) {
     if (e) e.preventDefault();
@@ -21,14 +37,33 @@ export default function PlaylistCreateBox({ onCreated, disabled }: PlaylistCreat
     setCreating(true);
     setError(null);
     try {
-      addPlaylist(playlistName.trim());
+      // pass cover base64 string if available
+      addPlaylist(playlistName.trim(), coverDataUrl ?? undefined);
       setPlaylistName('');
+      setCoverDataUrl(null);
+      setCoverFileName(null);
       setIsActive(false);
       if (onCreated) onCreated();
     } catch (e: any) {
       setError(String(e?.message || e));
     }
     setCreating(false);
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCoverFileName(file.name);
+    fileToDataUrl(file)
+      .then((dataUrl) => setCoverDataUrl(dataUrl))
+      .catch((err) => setError(String(err?.message || err)));
+  }
+
+  function clearCover() {
+    setCoverDataUrl(null);
+    setCoverFileName(null);
+    // reset file input value
+    if (fileInputRef.current) fileInputRef.current.value = '';
   }
 
   return (
@@ -74,7 +109,7 @@ export default function PlaylistCreateBox({ onCreated, disabled }: PlaylistCreat
             }}
           >
             <input
-              ref={inputRef}
+              ref={textInputRef}
               type="text"
               className="form-control mb-2"
               placeholder={t('playlistName')}
@@ -84,6 +119,43 @@ export default function PlaylistCreateBox({ onCreated, disabled }: PlaylistCreat
               maxLength={50}
               autoFocus
             />
+            <div className="mb-2">
+              <label className="small text-muted d-block mb-1">{t('coverImage')}</label>
+              <input
+                type="file"
+                accept="image/*"
+                className="form-control form-control-sm mb-1"
+                onChange={handleFileChange}
+                ref={fileInputRef}
+                disabled={creating}
+              />
+              {coverDataUrl && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <img
+                    src={coverDataUrl}
+                    alt={coverFileName ?? 'cover'}
+                    style={{
+                      width: 72,
+                      height: 72,
+                      objectFit: 'cover',
+                      borderRadius: 6,
+                      border: '1px solid rgba(255,255,255,0.06)',
+                    }}
+                  />
+                  <div>
+                    <div className="small text-light">{coverFileName}</div>
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline-light mt-1"
+                      onClick={clearCover}
+                      disabled={creating}
+                    >
+                      {t('remove')}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
             {error && <div className="small text-danger mb-2">{error}</div>}
             <div className="d-flex gap-2">
               <button
@@ -100,6 +172,7 @@ export default function PlaylistCreateBox({ onCreated, disabled }: PlaylistCreat
                   setIsActive(false);
                   setPlaylistName('');
                   setError(null);
+                  clearCover();
                 }}
               >
                 {t('cancel')}

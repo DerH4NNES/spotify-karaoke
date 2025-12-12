@@ -15,6 +15,16 @@
   "failedToLoadPlaylists": "Playlists konnten nicht geladen werden: {{error}}",
   "addPlaylist": "Playlist anlegen",
   "playlistName": "Name der Playlist...",
+  "coverImage": "Cover-Bild",
+  "remove": "Entfernen",
+  "confirm": {
+    "delete": "Löschen",
+    "cancel": "Abbrechen",
+    "deletePlaylistTitle": "Playlist \"{{name}}\" löschen?",
+    "deletePlaylistMessage": "Möchtest du die Playlist \"{{name}}\" wirklich löschen? Dies kann nicht rückgängig gemacht werden.",
+    "deleteTrackTitle": "Titel \"{{name}}\" löschen?",
+    "deleteTrackMessage": "Möchtest du den Titel \"{{name}}\" wirklich aus dieser Playlist löschen?"
+  },
   "create": "Anlegen",
   "creating": "Erstelle...",
   "cancel": "Abbrechen",

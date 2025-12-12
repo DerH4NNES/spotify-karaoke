@@ -7,12 +7,16 @@ import { addTrackToPlaylist, loadPlaylists } from '../spotify/playlistService';
 import BackButton from '../components/BackButton';
 import { useTranslation } from 'react-i18next';
 import PageHeader from '../components/PageHeader';
+import ConfirmModal from '../components/ConfirmModal';
+import { removeTrackFromPlaylist } from '../spotify/playlistService';
 
 export default function TrackPage() {
   const { provider: providerParam, playlistId } = useParams();
   const [tracks, setTracks] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<any | null>(null);
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -77,6 +81,36 @@ export default function TrackPage() {
         onSelectTrack={(t: any) => {
           if (!playlistId) return;
           navigate(`/${prov}/playlists/${playlistId}/${t.id}`);
+        }}
+        playlistId={playlistId}
+        onDeleteTrack={(trackId: string) =>
+          setTracks((prev) => prev.filter((t) => t.id !== trackId))
+        }
+        onRequestDelete={(item: any) => {
+          setPendingDelete(item);
+          setConfirmOpen(true);
+        }}
+      />
+
+      <ConfirmModal
+        show={confirmOpen}
+        title={
+          pendingDelete ? t('confirm.deleteTrackTitle', { name: pendingDelete.name }) : undefined
+        }
+        message={
+          pendingDelete ? t('confirm.deleteTrackMessage', { name: pendingDelete.name }) : undefined
+        }
+        onConfirm={() => {
+          if (pendingDelete && playlistId) {
+            const ok = removeTrackFromPlaylist(playlistId, pendingDelete.id);
+            if (ok) setTracks((prev) => prev.filter((t) => t.id !== pendingDelete.id));
+          }
+          setPendingDelete(null);
+          setConfirmOpen(false);
+        }}
+        onCancel={() => {
+          setPendingDelete(null);
+          setConfirmOpen(false);
         }}
       />
     </section>
