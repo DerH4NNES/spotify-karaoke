@@ -6,12 +6,15 @@ import TrackPage from './pages/TrackPage';
 import TrackDetailPage from './pages/TrackDetailPage';
 import PlayPage from './pages/PlayPage';
 import ProviderPage from './pages/ProviderPage';
+import CallbackPage from './pages/CallbackPage';
 
 export const AppRoutes: React.FC<any> = (props) => {
   return (
     <Routes>
       {/* provider choice */}
       <Route path="/" element={<ProviderPage />} />
+      {/* callback route for OAuth redirects */}
+      <Route path="/callback" element={<CallbackPage />} />
       {/* provider login: /:provider */}
       <Route path="/:provider" element={<LoginPage />} />
       {/* playlist listing for provider: /:provider/playlists */}
