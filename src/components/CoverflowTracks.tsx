@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import Coverflow from './coverflow/Coverflow';
+import { GiLoveSong } from 'react-icons/gi';
 
 type Track = {
   id: string;
@@ -14,8 +15,8 @@ export default function CoverflowTracks({
   tracks,
   onSelectTrack,
   closeModal,
-  playlistId,
-  onDeleteTrack,
+  playlistId: _playlistId,
+  onDeleteTrack: _onDeleteTrack,
   onItemContextMenu,
   onRequestDelete,
   loop = true,
@@ -31,6 +32,14 @@ export default function CoverflowTracks({
   loop?: boolean;
 }) {
   const { t } = useTranslation();
+  const contextHandler = onItemContextMenu
+    ? onItemContextMenu
+    : onRequestDelete
+      ? (e: React.MouseEvent, item: any) => {
+          e.preventDefault();
+          onRequestDelete(item);
+        }
+      : undefined;
   return (
     <Coverflow
       items={tracks as any}
@@ -38,21 +47,55 @@ export default function CoverflowTracks({
       ariaLabel={t('tracks')}
       visibleRange={2}
       animationMs={230}
-      onItemContextMenu={onItemContextMenu}
+      onItemContextMenu={contextHandler}
       renderItem={(tRaw: any, idx, { isCenter }) => {
         const trackItem = tRaw as Track;
         return (
           <div className="track-card card p-2 d-flex flex-column align-items-center">
-            <img
-              src={trackItem.album?.images?.[1]?.url || trackItem.album?.images?.[0]?.url}
-              alt={trackItem.name}
-              style={{
-                width: isCenter ? 180 : 120,
-                height: isCenter ? 180 : 120,
-                objectFit: 'cover',
-                borderRadius: 12,
-              }}
-            />
+            {(() => {
+              const imgUrl = trackItem.album?.images?.[1]?.url || trackItem.album?.images?.[0]?.url;
+              if (imgUrl) {
+                return (
+                  <img
+                    src={imgUrl}
+                    alt={trackItem.name}
+                    style={{
+                      width: isCenter ? 180 : 120,
+                      height: isCenter ? 180 : 120,
+                      objectFit: 'cover',
+                      borderRadius: 12,
+                      display: 'block',
+                    }}
+                  />
+                );
+              }
+              return (
+                <div
+                  style={{
+                    width: isCenter ? 180 : 120,
+                    height: isCenter ? 180 : 120,
+                    position: 'relative',
+                    borderRadius: 12,
+                    overflow: 'hidden',
+                    backgroundColor: '#333',
+                  }}
+                >
+                  <GiLoveSong
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      width: '140%',
+                      height: '140%',
+                      opacity: 0.06,
+                      color: 'white',
+                    }}
+                    aria-hidden
+                  />
+                </div>
+              );
+            })()}
             <div className="mt-2 text-center">
               <div className="fw-bold text-truncate" style={{ maxWidth: 180 }}>
                 {trackItem.name}

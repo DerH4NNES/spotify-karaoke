@@ -247,7 +247,16 @@
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(7, 8, 18, 0.06));
 }
 
+/* Ensure container itself never renders a background-image (prevents duplicates) */
 .playlist-card .card-img-top {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-image: none !important;
+}
+
+/* Target the actual image inside the card-img-top so sizing and object-fit are applied reliably */
+.playlist-card .card-img-top > img {
   display: block;
   width: 100%;
   height: 100%;

@@ -1,5 +1,4 @@
 import React from 'react';
-import { GiLoveSong } from 'react-icons/gi';
 
 type Props<T> = {
   items: T[];
@@ -41,21 +40,6 @@ export default function SimpleView<T>({
                 }}
               >
                 {renderItem(item, idx, { isCenter: true, pos: idx })}
-                {!(item as any).images?.[0]?.url && (
-                  <GiLoveSong
-                    style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      width: '140%',
-                      height: '140%',
-                      opacity: 0.06,
-                      color: 'white',
-                    }}
-                    aria-hidden
-                  />
-                )}
               </div>
             </div>
           </div>

@@ -50,28 +50,38 @@ export default function CoverflowFive({
               backgroundColor: '#333',
             }}
           >
-            {pl.images?.[0]?.url || pl?.cover ? (
-              <img
-                alt={pl.name}
-                src={pl.images?.[0]?.url || pl?.cover || '/favicon.ico'}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                loading="lazy"
-              />
-            ) : (
-              <GiLoveSong
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  width: '140%',
-                  height: '140%',
-                  opacity: 0.06,
-                  color: 'white',
-                }}
-                aria-hidden
-              />
-            )}
+            {(() => {
+              const bg = pl.images?.[0]?.url || pl?.cover;
+              if (bg) {
+                return (
+                  <img
+                    src={bg}
+                    alt={pl.name}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      display: 'block',
+                    }}
+                  />
+                );
+              }
+              return (
+                <GiLoveSong
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: '140%',
+                    height: '140%',
+                    opacity: 0.06,
+                    color: 'white',
+                  }}
+                  aria-hidden
+                />
+              );
+            })()}
           </div>
 
           <div className="card-body p-2">
