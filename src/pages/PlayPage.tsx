@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Button, ProgressBar, Spinner } from 'react-bootstrap';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Button, ProgressBar, Spinner, Modal } from 'react-bootstrap';
 import LyricRenderer from '../components/LyricRenderer';
 import useLyrics from '../hooks/useLyrics';
 import { sdk } from '../spotify/api';
@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import PageHeader from '../components/PageHeader';
 
 const PLAYER_NAME = import.meta.env.VITE_PLAYER_NAME || 'Karaokify';
+const PLAYER_COUNTDOWN_SECONDS = 5;
 
 export default function SpotifyPlayPage() {
   const { trackId } = useParams();
@@ -31,6 +32,7 @@ export default function SpotifyPlayPage() {
   const [playerReady, setPlayerReady] = useState<boolean>(false);
   const { lines, preload, clear } = useLyrics();
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   // Track laden
   useEffect(() => {
@@ -86,14 +88,14 @@ export default function SpotifyPlayPage() {
       } else {
         console.log('No player available');
       }
-    }, 150);
+    }, 50);
     return () => clearInterval(id);
   }, [hasStarted, isPaused, showEndOverlay, duration, player, playerReady]);
 
   // Countdown-Logik
   useEffect(() => {
     if (!showCountdown) return;
-    setCountdown(5);
+    setCountdown(PLAYER_COUNTDOWN_SECONDS);
     const id = window.setInterval(() => {
       setCountdown((c) => {
         if (c <= 1) {
@@ -122,6 +124,31 @@ export default function SpotifyPlayPage() {
   const handleUnPause = async () => {
     setIsPaused(false);
     if (player) await player.resume();
+  };
+
+  // Wiederholen/Navigation handlers for end overlay
+  const handleRepeat = async () => {
+    try {
+      // Try to seek to 0 and resume on the SDK player
+      if (player) {
+        await player.seek(0);
+        await player.resume();
+      } else if (deviceId && track?.uri) {
+        await sdk.player.startResumePlayback(deviceId, undefined, [track.uri], undefined, 0);
+      }
+      setProgress(0);
+      setIsPaused(false);
+      setShowEndOverlay(false);
+      setHasStarted(true);
+    } catch (e) {
+      console.error('Failed to repeat track', e);
+    }
+  };
+
+  const handleGoToPlaylistOverview = () => {
+    setShowEndOverlay(false);
+    // navigate to spotify playlists overview
+    navigate('/spotify/playlists');
   };
 
   // Seek Controls
@@ -235,11 +262,26 @@ export default function SpotifyPlayPage() {
                       <LyricRenderer
                         lines={lines}
                         currentPositionMs={progress}
-                        offsetMs={0}
+                        offsetMs={200}
                         initialProgressMs={0}
                       />
                     </div>
                   )}
+                  {/* End overlay modal: ask to go back to playlists or repeat song */}
+                  <Modal show={showEndOverlay} centered onHide={() => setShowEndOverlay(false)}>
+                    <Modal.Header closeButton>
+                      <Modal.Title>{t('endOverlay.title')}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>{t('endOverlay.body')}</Modal.Body>
+                    <Modal.Footer>
+                      <Button variant="secondary" onClick={handleGoToPlaylistOverview}>
+                        {t('endOverlay.goToPlaylists')}
+                      </Button>
+                      <Button variant="primary" onClick={handleRepeat}>
+                        {t('endOverlay.repeatSong')}
+                      </Button>
+                    </Modal.Footer>
+                  </Modal>
                 </>
               )
             )}

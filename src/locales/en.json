@@ -42,5 +42,11 @@
   "chooseProviderSub": "Select the service from which you want to view playlists and tracks.",
   "loginForProvider": "Login for provider: {{provider}}",
   "login": "Login",
-  "logout": "Logout"
+  "logout": "Logout",
+  "endOverlay": {
+    "title": "Playback ended",
+    "body": "Do you want to return to the playlist overview or repeat the song?",
+    "goToPlaylists": "To playlist overview",
+    "repeatSong": "Repeat song"
+  }
 }
